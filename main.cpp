@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "cpin.h"
 #include "cloptions.h"
+#include "test.h"
 
 using namespace std;
 
@@ -11,6 +12,8 @@ int main(int argc, char**argv) {
    CLOptions clopt = CLOptions(argc, argv);
    if (clopt.Parse())
       return 1;
+
+   test_clopt(clopt);
 
    Cpin my_cpin = Cpin(clopt.Cpin());
    

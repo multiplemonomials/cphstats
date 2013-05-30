@@ -1,11 +1,11 @@
-OBJS = main.o cpin.o parse_cpin.o string_manip.o cloptions.o
+OBJS = main.o cpin.o parse_cpin.o string_manip.o cloptions.o test.o
 CXX = g++
 F90 = gfortran
 #OPTFLAGS = -O3 -mtune=native
 OPTFLAGS = -O0 -g
 
 install: $(OBJS)
-	g++ -o cphutil $(OBJS) -lgfortran
+	g++ -Wall -o cphutil $(OBJS) -lgfortran
 
 .SUFFIXES: .F90 .cpp .o
 
