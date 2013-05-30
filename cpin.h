@@ -14,7 +14,7 @@ typedef struct {
 
 extern "C" {
    void parse_cpin_(int*, int[TITR_STATES_C], StateInfo[TITR_RES_C],
-                        char[40][TITR_RES_C+1], char[FN_LEN], int*);
+                        char[TITR_RES_C+1][40], char[FN_LEN], int*);
 }
 
 // Wrapper for calling the Fortran cpin

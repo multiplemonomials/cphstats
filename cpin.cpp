@@ -12,8 +12,12 @@ is_valid(false)
    int ierr;
    parse_cpin_(&trescnt_, protcnt_, stateinf_, resname, my_fname, &ierr);
 
-   for (int i = 0; i < trescnt_; i++)
-      resname_.push_back(std::string(resname[i]));
+   for (int i = 0; i <= trescnt_; i++) {
+      char r[41];
+      strncpy(r, resname[i], 41);
+      r[40] = '\0';
+      resname_.push_back(std::string(r));
+   }
 
    if (ierr != 0)
       fprintf(stderr, "Error: Could not open %s for reading!\n", cpinname);
@@ -30,8 +34,12 @@ is_valid(false)
    int ierr;
    parse_cpin_(&trescnt_, protcnt_, stateinf_, resname, my_fname, &ierr);
 
-   for (int i = 0; i < trescnt_; i++)
-      resname_.push_back(std::string(resname[i]));
+   for (int i = 0; i <= trescnt_; i++) {
+      char r[41];
+      strncpy(r, resname[i], 41);
+      r[40] = '\0';
+      resname_.push_back(std::string(r));
+   }
 
    if (ierr != 0)
       fprintf(stderr, "Error: Could not open %s for reading!\n", my_fname);
