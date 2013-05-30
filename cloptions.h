@@ -11,7 +11,7 @@ using namespace std;
 
 class CLOptions {
    public:
-      enum RetType {OK=0, HELP, VERSION, ERR};
+      enum RetType {OK=0, HELP, VERSION, ERR, INSUFARGS};
 
       CLOptions(int, char**);
 

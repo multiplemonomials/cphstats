@@ -57,45 +57,55 @@ overwrite_(false)
          break;
      }else if (strncmp("-i", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          cpin_ = std::string(argv[i]);
      }else if (strncmp("--cpin", argv[i], 6) == 0 && strlen(argv[i]) == 6) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          cpin_ = std::string(argv[i]);
      }else if (strncmp("--calcpka-output", argv[i], 16) == 0 && 
                strlen(argv[i]) == 16) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          output_ = std::string(argv[i]);
      }else if (strncmp("-o", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          output_ = std::string(argv[i]);
      }else if (strncmp("-v", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          verbose_ = atoi(argv[i]);
      }else if (strncmp("--verbose", argv[i], 9) == 0 && strlen(argv[i]) == 9) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          verbose_ = atoi(argv[i]);
      }else if (strncmp("-R", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          runavgout_ = std::string(argv[i]);
      }else if (strncmp("--running-avg-out", argv[i], 17) == 0 && 
                strlen(argv[i]) == 17) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          runavgout_ = std::string(argv[i]);
      }else if (strncmp("--chunk-out", argv[i], 11) == 0 && strlen(argv[i]) == 11) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          chunkout_ = std::string(argv[i]);
      }else if (strncmp("--cumulative-out", argv[i], 16) == 0 && 
                strlen(argv[i]) == 16) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          chunkout_ = std::string(argv[i]);
      }else if (strncmp("--calcpka", argv[i], 9) == 0 && strlen(argv[i]) == 9) {
@@ -106,14 +116,17 @@ overwrite_(false)
          do_calcpka_ = false;
      }else if (strncmp("-r", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          runavgwin_ = atoi(argv[i]);
      }else if (strncmp("--running-avg", argv[i], 13) == 0 && strlen(argv[i]) == 13) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          runavgwin_ = atoi(argv[i]);
      }else if (strncmp("--chunk", argv[i], 7) == 0 && strlen(argv[i]) == 7) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          chunksize_ = atoi(argv[i]);
      }else if (strncmp("--cumulative", argv[i], 12) == 0 && strlen(argv[i]) == 12) {
@@ -121,6 +134,7 @@ overwrite_(false)
          cumulative_ = true;
      }else if (strncmp("--fix-remd", argv[i], 10) == 0 && strlen(argv[i]) == 10) {
          marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          reorder_prefix_ = std::string(argv[i]);
      }else if (strncmp("-", argv[i], 1) == 0) {
@@ -226,6 +240,8 @@ int CLOptions::Parse() {
       Help();
    else if (parse_return_ == VERSION)
       Version();
+   else if (parse_return_ == INSUFARGS)
+      fprintf(stderr, "Insufficient arguments!\n");
 
    return parse_return_;
 }
