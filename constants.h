@@ -9,4 +9,6 @@
 #define MAX_H_COUNT 4
 #define FN_LEN 256
 
+typedef unsigned int uint;
+
 #endif /* CONSTANTS_H */

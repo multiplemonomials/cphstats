@@ -17,33 +17,80 @@ extern "C" {
                         char[TITR_RES_C+1][40], char[FN_LEN], int*);
 }
 
-// Wrapper for calling the Fortran cpin
-
-class Cpin {
+/// A titratable residue
+class TitratableResidue {
    public:
-   // Constructors
-   Cpin(const char*);
-   Cpin(std::string const&);
+      // Constructors (only the implemented/used ones are uncommented)
+//    TitratableResidue(const char*);
+//    TitratableResidue(std::string const&);
+      TitratableResidue(std::string const&, std::vector<int> const&);
+//    TitratableResidue(const char*, int*);
 
-   // Get the data
-   std::vector<std::string> getResnames() {return resname_;}
+      // A way to add a list of states
+      void defineStates(std::vector<int>);
+      void defineStates(int*);
 
-   int getTrescnt() { return trescnt_; }
+      // In-line Setters
+      void setResname(const char* resname) { resname_ = std::string(resname); }
+      void setResname(std::string const& resname) { resname_ = resname; }
+      void setResnum(int resnum) { resid_ = resnum; }
+      
+      // In-line Getters
+      std::string getResname() { return resname_; }
+      int getResnum() { return resid_; }
 
-   bool isOpen() { return is_valid; }
+      // Determine how many states are present
+      int numStates() { return protonated_.size(); }
+
+      // Determine if a particular state is protonated or not
+      bool isProtonated(int state) { return protonated_[state]; }
 
    private:
-   // Data
-   bool is_valid;
-   // CpHMD state info struct and array
-   StateInfo stateinf_[TITR_RES_C];
-   // Number of titrating residues
-   int trescnt_;
-   // Array of protonation states
-   int protcnt_[TITR_STATES_C];
-   // Residue names
-   //char resname_[TITR_RES_C+1][40];
-   std::vector<std::string> resname_;
+      /// How many protons are in each state?
+      std::vector<int> protcnts_;
+
+      /// Is each state protonated?
+      std::vector<bool> protonated_;
+
+      /// Name of the titratable residue
+      std::string resname_;
+
+      /// Number of the residue
+      int resid_;
+};
+
+/// Wrapper for calling the Fortran cpin
+class Cpin {
+   public:
+      // Constructors
+      Cpin(const char*);
+      Cpin(std::string const&);
+
+      // Get the data
+      std::vector<TitratableResidue> getResidues();
+
+      int getTrescnt() { return trescnt_; }
+
+      bool isRead() { return is_valid_; }
+
+   private:
+      /// Is our cpin file valid?
+      bool is_valid_;
+
+      /// CpHMD state info array (analogous to the one used in sander)
+      StateInfo stateinf_[TITR_RES_C];
+
+      /// Number of titratable residues defined in the cpin
+      int trescnt_;
+
+      /// Number of 'active' protons in each state
+      int protcnt_[TITR_STATES_C];
+
+      /// Name of each titratable residue
+      std::vector<std::string> resname_;
+
+      /// List of titratable residues
+      std::vector<TitratableResidue> residues_;
 
 };
 #endif /* CPIN_H */

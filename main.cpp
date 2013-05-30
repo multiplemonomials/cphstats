@@ -1,22 +1,35 @@
 #include <cstdio>
 #include "cpin.h"
+#include "cloptions.h"
 
 using namespace std;
 
 int main(int argc, char**argv) {
 
-   if (argc < 2) {
-      printf("Usage: cphutil <cpin>\n");
-      return 0;
+
+   // Set up the command-line options and parse them
+   CLOptions clopt = CLOptions(argc, argv);
+   if (clopt.Parse())
+      return 1;
+
+   Cpin my_cpin = Cpin(clopt.Cpin());
+   
+   std::vector<TitratableResidue> residues = my_cpin.getResidues();
+
+   printf("There are %d titratable residues!\n", (int)residues.size());
+   printf("They are:\n");
+   for (int i = 0; i < my_cpin.getTrescnt(); i++) {
+      printf("\t%s %d (%d states) [ ", residues[i].getResname().c_str(),
+             residues[i].getResnum(), residues[i].numStates());
+      for (int j = 0; j < residues[i].numStates(); j++) {
+         if (residues[i].isProtonated(j))
+            printf("P ");
+         else
+            printf("D ");
+      }
+      printf("]\n");
    }
 
-   Cpin my_cpin = Cpin(argv[1]);
-
-   printf("There are %d titratable residues!\n", my_cpin.getTrescnt());
-   printf("They are:\n");
-   vector<string> rnames = my_cpin.getResnames();
-   for (int i = 0; i <= my_cpin.getTrescnt(); i++)
-      printf("\t%s\n", rnames[i].c_str());
    printf("All done!\n");
 
    return 0;

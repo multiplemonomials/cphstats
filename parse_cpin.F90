@@ -36,6 +36,7 @@ subroutine parse_cpin(trescnt, protcnt, stateinf, resname, cpin_name, ierr)
    character(len=40)   :: resname(0:TITR_RES_C)
 
    type(const_ph_info) :: stateinf(0:TITR_RES_C-1)
+   type(const_ph_info) :: null_cnstph_info = const_ph_info(0,0,0,0,0)
 
    ! Is our cpin file read yet?
 
@@ -63,6 +64,7 @@ subroutine parse_cpin(trescnt, protcnt, stateinf, resname, cpin_name, ierr)
    chrgdat(:) = 0.d0
    statene(:) = 0.d0
    resname(:) = ' '
+   stateinf(:) = null_cnstph_info
    cphfirst_sol = 0
    cph_igb = 0
    cph_intdiel = 0.d0
