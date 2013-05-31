@@ -13,7 +13,7 @@ CpoutFile::CpoutFile(std::string const& fname) {
    valid_ = true;
    done_ = false;
 
-   if (fname.find_last_of('.') != std::string::npos) {
+   if (fname.find_last_of(".") != std::string::npos) {
       // Get the suffix
       std::string sfx = fname.substr(fname.find_last_of('.'));
       if (sfx == std::string(".bz2")) {
@@ -40,7 +40,7 @@ CpoutFile::CpoutFile(std::string const& fname) {
       }
    }
    
-   char* buf = NULL;
+   char buf[LINEBUF+1];
    if (Gets(buf, LINEBUF)) {
       fprintf(stderr, "Could not read from %s\n", fname.c_str());
       Close();
@@ -50,7 +50,11 @@ CpoutFile::CpoutFile(std::string const& fname) {
          if (sscanf(buf, "Solvent pH: %f\n", &orig_ph_) != 1)
             fprintf(stderr, "OH NO!\n");
          Gets(buf, LINEBUF);
-         sscanf(buf, "Monte Carlo step size: %d\n", &step_size_);
+         if (sscanf(buf, "Monte Carlo step size: %d\n", &step_size_) != 1) {
+            fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
+            valid_ = false;
+            Close();
+         }
          fseek(fp_, 0, SEEK_SET);
      }else {
          fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
@@ -71,13 +75,15 @@ int CpoutFile::GzGets(char* str, int num) {
 }
 
 int CpoutFile::AsciiGets(char* str, int num) {
-   if (fgets(str, num, fp_) == NULL)
+   fflush(stdout);
+   if (fgets(str, num, fp_) == NULL) {
       return 1;
+   }
    return 0;
 }
 
 Record CpoutFile::GetRecord() {
-   char* buf = NULL;
+   char buf[LINEBUF+1];
 
    // Create an empty record for return
    Record empty_record;

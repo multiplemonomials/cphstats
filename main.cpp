@@ -35,9 +35,12 @@ int main(int argc, char**argv) {
    }
 
    vector<CpoutFile> cpouts;
-   for (vector<string>::iterator it = clopt.Cpouts().begin();
-        it != clopt.Cpouts().end(); it++)
+   for (vector<string>::const_iterator it = clopt.Cpouts().begin();
+        it != clopt.Cpouts().end(); it++) {
+      fprintf(stdout, "Found cpout file %s\n", it->c_str());
       cpouts.push_back(CpoutFile(*it));
+      printf("Done loading %s\n", it->c_str());
+   }
 
    printf("Found %d cpouts.\n", (int)clopt.Cpouts().size());
 

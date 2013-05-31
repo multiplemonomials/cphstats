@@ -10,7 +10,7 @@ void test_clopt(CLOptions clopt) {
    printf("The cpouts are:\n");
 // for (uint i = 0; i < clopt.Cpouts().size(); i++)
 //    printf("\t%s\n", clopt.Cpouts()[i].c_str());
-   for (std::vector<std::string>::iterator it = clopt.Cpouts().begin();
+   for (std::vector<std::string>::const_iterator it = clopt.Cpouts().begin();
         it != clopt.Cpouts().end(); it++)
       printf("\t%s\n", it->c_str());
    printf("The cpin is: %s\n", clopt.Cpin().c_str());
