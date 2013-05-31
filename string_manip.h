@@ -7,9 +7,13 @@
 
 using namespace std;
 
+vector<string> split(char*, const char*);
 vector<string> split(string const&, const char*);
-vector<string> split(const char*, const char*);
 vector<string> split(string const&, string const&);
 vector<string> split(string const&);
+vector<string> split(char*);
+
+string strip(string const&);
+string strip(char*);
 
 #endif

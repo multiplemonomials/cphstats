@@ -119,16 +119,31 @@ overwrite_(false)
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          runavgwin_ = atoi(argv[i]);
+         if (runavgwin_ == 0) {
+            fprintf(stderr, "Error: Bad argument for running average window!\n");
+            parse_return_ = ERR;
+            break;
+         }
      }else if (strncmp("--running-avg", argv[i], 13) == 0 && strlen(argv[i]) == 13) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          runavgwin_ = atoi(argv[i]);
+         if (runavgwin_ == 0) {
+            fprintf(stderr, "Error: Bad argument for running average window!\n");
+            parse_return_ = ERR;
+            break;
+         }
      }else if (strncmp("--chunk", argv[i], 7) == 0 && strlen(argv[i]) == 7) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          chunksize_ = atoi(argv[i]);
+         if (chunksize_ == 0) {
+            fprintf(stderr, "Error: Bad argument for running average window!\n");
+            parse_return_ = ERR;
+            break;
+         }
      }else if (strncmp("--cumulative", argv[i], 12) == 0 && strlen(argv[i]) == 12) {
          marked[i] = true;
          cumulative_ = true;
