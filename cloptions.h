@@ -43,6 +43,11 @@ class CLOptions {
       int ChunkWindow()          { return chunksize_; }
       string REMDPrefix()        { return reorder_prefix_; }
 
+      // Provide an iterator over the cpouts
+      typedef vector<string>::const_iterator cpout_iterator;
+      cpout_iterator begin()     { return cpouts_.begin(); }
+      cpout_iterator end()       { return cpouts_.end();   }
+
    private:
       /// Name of the input cpin file
       string cpin_;
