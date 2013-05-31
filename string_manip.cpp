@@ -16,15 +16,18 @@ vector<string> split(char* instring, const char* delim) {
    return result;
 }
 vector<string> split(string const& instring, const char* delim) {
-   return split(instring.c_str(), delim);
+   char* buf = (char*)instring.c_str();
+   return split(buf, delim);
 }
 
 vector<string> split(string const& instring, string const& delim) {
-   return split(instring, delim.c_str());
+   char* buf = (char*)instring.c_str();
+   return split(buf, delim.c_str());
 }
 
 vector<string> split(string const& instring) {
-   return split(instring, " \n\r");
+   char* buf = (char*)instring.c_str();
+   return split(buf, " \n\r");
 }
 
 vector<string> split(char* instring) {
