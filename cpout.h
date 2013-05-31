@@ -2,8 +2,13 @@
 #define CPOUT_H
 
 #include <cstdio>
+#include <vector>
+#include <string>
+
 // To support compression
 #include "zlib.h"
+
+#include "constants.h"
 
 typedef struct {
    int residue;
@@ -29,7 +34,7 @@ class CpoutFile {
       bool Done()  { return !valid_ || done_; }
 
       // Destructor
-      ~CpoutFile();
+//    ~CpoutFile();
 
       // Get the next record
       Record GetRecord();
@@ -37,7 +42,8 @@ class CpoutFile {
    private:
       // Auto-dispatch
       int Gets(char* c, int i) { if (type_ == ASCII) return AsciiGets(c, i);
-                                 if (type_ == GZIP) return GzGets(c, i); }
+                                 if (type_ == GZIP) return GzGets(c, i); 
+                                 return 1;}
 
       void Close() { if (type_ == ASCII) fclose(fp_);
                      if (type_ == GZIP) gzclose(gzfp_); }
@@ -55,7 +61,7 @@ class CpoutFile {
       bool valid_; // Is this a valid file?
       bool done_;  // Is this file done reading?
       float orig_ph_; // pH on the opening full record
-      float step_size_; // Monte carlo step size
+      int step_size_; // Monte carlo step size
 };
 
 #endif /* CPOUT_H */

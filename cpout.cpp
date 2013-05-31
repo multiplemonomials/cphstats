@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include "cpout.h"
 #include "string_manip.h"
 
@@ -39,20 +40,20 @@ CpoutFile::CpoutFile(std::string const& fname) {
       }
    }
    
-   char* buf;
+   char* buf = NULL;
    if (Gets(buf, LINEBUF)) {
       fprintf(stderr, "Could not read from %s\n", fname.c_str());
       Close();
       valid_ = false;
   }else{
-      if (strncmp(buf, "Solvent pH:", 11) == 0)
+      if (strncmp(buf, "Solvent pH:", 11) == 0) {
          if (sscanf(buf, "Solvent pH: %f\n", &orig_ph_) != 1)
             fprintf(stderr, "OH NO!\n");
          Gets(buf, LINEBUF);
          sscanf(buf, "Monte Carlo step size: %d\n", &step_size_);
          fseek(fp_, 0, SEEK_SET);
-      else {
-         fprintf(stderr, "Did not recognize the format of cpout %s.\n" fname.c_str());
+     }else {
+         fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
          Close();
          valid_ = false;
       }
@@ -76,11 +77,14 @@ int CpoutFile::AsciiGets(char* str, int num) {
 }
 
 Record CpoutFile::GetRecord() {
-   char* buf;
+   char* buf = NULL;
+
+   // Create an empty record for return
+   Record empty_record;
+   empty_record.pH = 0.0f; empty_record.full = false;
+
    if (Gets(buf, LINEBUF)) {
       done_ = true;
-      Record empty_record;
-      empty_record.pH = 0.0f; empty_record.full = false;
       return empty_record;
    }
    Record result;
@@ -101,7 +105,7 @@ Record CpoutFile::GetRecord() {
       while (sscanf(buf, "Residue %d State: %d\n", &res, &state) == 2) {
          RecordPoint opt;
          opt.state = state; opt.residue = res;
-         result.points.push_back(pt);
+         result.points.push_back(opt);
          if (Gets(buf, LINEBUF)) {
             done_ = true;
             Close();
@@ -111,9 +115,8 @@ Record CpoutFile::GetRecord() {
   }else {
       fprintf(stderr, "Unrecognized cpout file!\n");
       Close();
-      done_ = true;
-      Record empty_record;
-      empty_record.pH = 0.0f; empty_record.full = false;
       return empty_record;
    }
+
+   return empty_record;
 }

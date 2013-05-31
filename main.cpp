@@ -1,5 +1,6 @@
 #include <cstdio>
 #include "cpin.h"
+#include "cpout.h"
 #include "cloptions.h"
 #include "test.h"
 
@@ -32,6 +33,13 @@ int main(int argc, char**argv) {
       }
       printf("]\n");
    }
+
+   vector<CpoutFile> cpouts;
+   for (vector<string>::iterator it = clopt.Cpouts().begin();
+        it != clopt.Cpouts().end(); it++)
+      cpouts.push_back(CpoutFile(*it));
+
+   printf("Found %d cpouts.\n", (int)clopt.Cpouts().size());
 
    printf("All done!\n");
 
