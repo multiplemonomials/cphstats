@@ -45,6 +45,6 @@ class ProtTraj {
       float pH_;
 
       // Number of frames
-      int nframes_;
+      long long int nframes_;
 };
 #endif /* PROTTRAJ_H */
