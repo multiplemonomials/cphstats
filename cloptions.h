@@ -29,23 +29,24 @@ class CLOptions {
       int CheckInput();
 
       /// These functions are getters for the various options
-      std::vector<std::string> Cpouts(){ return cpouts_;         }
-      int Verbose()                    { return verbose_;        }
-      std::string Cpin()               { return cpin_;           }
-      std::string Output()             { return output_;         }
-      bool Calcpka()                   { return do_calcpka_;     }
-      std::string CumulativeOutput()   { return cumout_;         }
-      bool doCumulative()              { return cumulative_;     }
-      std::string RunningAvgOutput()   { return runavgout_;      }
-      std::string Prog()               { return prog_;           }
-      std::string ChunkOutput()        { return chunkout_;       }
-      bool Overwrite()                 { return overwrite_;      }
-      int RunningAvgWindow()           { return runavgwin_;      }
-      int ChunkWindow()                { return chunksize_;      }
-      int Interval()                   { return interval_;       }
-      bool PrintProtonated()           { return protonated_;     }
-      bool PrintDeprotonated()         { return !protonated_;    }
-      std::string REMDPrefix()         { return reorder_prefix_; }
+      std::vector<std::string> Cpouts() const { return cpouts_;         }
+      int Verbose() const                     { return verbose_;        }
+      std::string Cpin() const                { return cpin_;           }
+      std::string Output() const              { return output_;         }
+      bool Calcpka() const                    { return do_calcpka_;     }
+      std::string CumulativeOutput() const    { return cumout_;         }
+      bool doCumulative() const               { return cumulative_;     }
+      std::string RunningAvgOutput() const    { return runavgout_;      }
+      std::string Prog() const                { return prog_;           }
+      std::string ChunkOutput() const         { return chunkout_;       }
+      bool Overwrite() const                  { return overwrite_;      }
+      int RunningAvgWindow() const            { return runavgwin_;      }
+      int ChunkWindow() const                 { return chunksize_;      }
+      int Interval() const                    { return interval_;       }
+      bool PrintProtonated() const            { return protonated_;     }
+      bool PrintDeprotonated() const          { return !protonated_;    }
+      std::string REMDPrefix() const          { return reorder_prefix_; }
+      float TimeStep() const                  { return time_step_;      }
 
       // Provide an iterator over the cpouts
       typedef std::vector<std::string>::const_iterator cpout_iterator;
@@ -87,6 +88,8 @@ class CLOptions {
       int interval_;
       /// Do we print out protonated statistics?
       bool protonated_;
+      /// Time step used in the simulation
+      float time_step_;
 
 };
 

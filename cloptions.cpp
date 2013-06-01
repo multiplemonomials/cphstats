@@ -18,7 +18,8 @@ runavgwin_(0),
 chunksize_(0),
 overwrite_(false),
 interval_(1),
-protonated_(true)
+protonated_(true),
+time_step_(0.002f)
 {
    
    // Initialize some strings
@@ -123,6 +124,16 @@ protonated_(true)
             parse_return_ = ERR;
             break;
          }
+     }else if (strncmp("-t", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
+         marked[i] = true;
+         time_step_ = atof(argv[i]);
+     }else if (strncmp("--time-step", argv[i], 11) == 0 && strlen(argv[i]) == 11) {
+         marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
+         marked[i] = true;
+         time_step_ = atof(argv[i]);
      }else if (strncmp("--running-avg", argv[i], 13) == 0 && strlen(argv[i]) == 13) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
@@ -204,11 +215,15 @@ void CLOptions::Help() {
    printf("    -O, --overwrite\n");
    printf("                   Allow existing outputs to be overwritten.\n");
    printf("\n");
-   printf("Input Files:\n");
+   printf("Input Files and Options:\n");
    printf("    -i FILE, --cpin FILE\n");
    printf("\n");
    printf("                   Input cpin file (from sander) with titrating residue\n");
    printf("                   information.\n");
+   printf("    -t FLOAT, --time-step FLOAT\n");
+   printf("                   This is the time step in ps you used in your simulations.\n");
+   printf("                   It will be used to print data as a function of time.\n");
+   printf("                   Default is 2 fs (0.002)\n");
    printf("\n");
    printf("Output Files:\n");
    printf("    -o FILE, --calcpka-output FILE\n");
@@ -273,7 +288,7 @@ void CLOptions::Help() {
 }
 
 void CLOptions::Usage() {
-   printf("Usage: %s [-O] [-V] [-h] [-i <cpin>] [-o FILE] [-R FILE -r INT]\n", prog_.c_str());
+   printf("Usage: %s [-O] [-V] [-h] [-i <cpin>] [-t] [-o FILE] [-R FILE -r INT]\n", prog_.c_str());
    printf("             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]\n");
    printf("             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]\n");
    printf("             cpout1 [cpout2 [cpout3 ...] ]\n");
