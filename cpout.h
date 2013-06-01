@@ -48,6 +48,8 @@ class CpoutFile {
       int Gets(char* c, int i) { if (type_ == ASCII) return AsciiGets(c, i);
                                  if (type_ == GZIP) return GzGets(c, i); 
                                  return 1;}
+      void Rewind() { if (type_ == ASCII) fseek(fp_, 0, SEEK_SET);
+                      if (type_ == GZIP) gzseek(gzfp_, 0, SEEK_SET); }
 
       void Close() { if (type_ == ASCII) fclose(fp_);
                      if (type_ == GZIP) gzclose(gzfp_); }

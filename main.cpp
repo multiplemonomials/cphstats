@@ -8,7 +8,6 @@ using namespace std;
 
 int main(int argc, char**argv) {
 
-
    // Set up the command-line options and parse them
    CLOptions clopt = CLOptions(argc, argv);
    if (clopt.Parse())
