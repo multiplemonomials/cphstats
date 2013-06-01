@@ -69,7 +69,7 @@ nres_(0)
             nres_++;
             Gets(buf, LINEBUF);
          }
-         Rewind(); fseek(fp_, 0, SEEK_SET);
+         Rewind();
      }else {
          fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
          Close();
