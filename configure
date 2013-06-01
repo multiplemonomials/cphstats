@@ -60,7 +60,7 @@ else:
    f90 = 'ifort'
    ld = 'ifort'
    ldflags = ['-nofor_main', '-lstdc++', '-lz']
-   cppflags = ['-warn', 'all']
+   cppflags = ['-Wall']
    f90flags = ['-warn', 'all']
 
    if opt.opt:
