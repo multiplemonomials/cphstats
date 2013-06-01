@@ -60,7 +60,8 @@ int sort_remd_files(CpoutList cpouts, std::string const& prefix,
                      pit != rec.points.end(); pit++)
             fprintf(filemap[rec.pH], "Residue %4d State: %2d\n",
                     pit->residue, pit->state);
-         fprintf(filemap[rec.pH], "\n"); // terminate this record
+         if (!rec.points.empty())
+            fprintf(filemap[rec.pH], "\n"); // terminate this record
       }
       // Refresh whether or not we're done
       done = false;
