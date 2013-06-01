@@ -21,4 +21,6 @@ depends::
 clean:
 	/bin/rm -f $(OBJS)
 
+new: clean install
+
 include depends

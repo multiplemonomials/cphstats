@@ -44,3 +44,36 @@ void test_clopt(CLOptions clopt) {
 
    return;
 }
+
+void test_cpouts(std::vector<CpoutFile> cpouts) {
+   
+   std::vector< std::vector<int> > statelist;
+
+   fprintf(stdout, "I have %d cpouts.\n", (int)cpouts.size());
+
+   for (int i = 0; i < cpouts[0].Nres(); i++) {
+      std::vector<int> newstates;
+      statelist.push_back( newstates );
+   }
+   int i = 0;
+   for (std::vector<CpoutFile>::iterator it = cpouts.begin();
+         it != cpouts.end(); it++) {
+      
+      fprintf(stdout, "Analyzing Cpout file %s.\n", it->Filename().c_str());
+      Record myrec;
+      do {
+         myrec = it->GetRecord();
+         for (uint j = 0; j < myrec.points.size(); j++)
+            statelist[myrec.points[j].residue].push_back(myrec.points[j].state);
+      } while (!it->Done());
+      i++;
+   }
+
+   for (int j = 0; j < cpouts[0].Nres(); j++) {
+      for (std::vector<int>::const_iterator it = statelist[j].begin();
+               it != statelist[j].end(); it++) {
+         fprintf(stdout, "Residue %4d State: %2d\n", j, *it);
+      }
+   }
+   return;
+}

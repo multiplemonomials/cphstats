@@ -20,6 +20,7 @@ int main(int argc, char**argv) {
    
    std::vector<TitratableResidue> residues = my_cpin.getResidues();
 
+//#if 0
    printf("There are %d titratable residues!\n", (int)residues.size());
    printf("They are:\n");
    for (int i = 0; i < my_cpin.getTrescnt(); i++) {
@@ -33,15 +34,18 @@ int main(int argc, char**argv) {
       }
       printf("]\n");
    }
+//#endif
 
    vector<CpoutFile> cpouts;
    for (CLOptions::cpout_iterator it = clopt.begin(); it != clopt.end(); it++) {
-      fprintf(stdout, "Found cpout file %s\n", it->c_str());
-      cpouts.push_back(CpoutFile(*it));
-      printf("Done loading %s\n", it->c_str());
+      CpoutFile c = CpoutFile(*it);
+      cpouts.push_back(c);
+      fprintf(stdout, "Cpout file %s has %d residues.\n", it->c_str(), c.Nres());
    }
 
    printf("Found %d cpouts.\n", (int)clopt.Cpouts().size());
+
+   test_cpouts(cpouts);
 
    printf("All done!\n");
 

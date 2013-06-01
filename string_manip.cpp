@@ -4,6 +4,8 @@
 #include "constants.h"
 #include "string_manip.h"
 
+using namespace std;
+
 /// Splits a string along a specific delimiter
 vector<string> split(char* instring, const char* delim) {
    vector<string> result;

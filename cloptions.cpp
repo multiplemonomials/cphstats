@@ -7,6 +7,8 @@
 #include <cstdio>
 #include "cloptions.h"
 
+using namespace std;
+
 /// Test if a file exists
 bool fexists(string const& fname) {
    ifstream f(fname.c_str());

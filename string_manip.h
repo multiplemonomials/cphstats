@@ -5,15 +5,13 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+std::vector<std::string> split(char*, const char*);
+std::vector<std::string> split(std::string const&, const char*);
+std::vector<std::string> split(std::string const&, std::string const&);
+std::vector<std::string> split(std::string const&);
+std::vector<std::string> split(char*);
 
-vector<string> split(char*, const char*);
-vector<string> split(string const&, const char*);
-vector<string> split(string const&, string const&);
-vector<string> split(string const&);
-vector<string> split(char*);
-
-string strip(string const&);
-string strip(char*);
+std::string strip(std::string const&);
+std::string strip(char*);
 
 #endif

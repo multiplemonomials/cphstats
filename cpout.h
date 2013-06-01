@@ -29,9 +29,13 @@ class CpoutFile {
       CpoutFile(std::string const&);
       CpoutFile(const char*);
       
-      // See if this cpout file is valid
-      bool Valid() { return valid_; }
-      bool Done()  { return !valid_ || done_; }
+      // Getters
+      bool Valid()   { return valid_; }
+      bool Done()    { return !valid_ || done_; }
+      int Nres()     { return nres_;  }
+      int StepSize() { return step_size_; }
+
+      std::string Filename() { return filename_; }
 
       // Destructor
 //    ~CpoutFile();
@@ -58,10 +62,12 @@ class CpoutFile {
       // File type (ASCII? Gzip?)
       FileType type_;
 
+      std::string filename_; // Original file name
       bool valid_; // Is this a valid file?
       bool done_;  // Is this file done reading?
       float orig_ph_; // pH on the opening full record
       int step_size_; // Monte carlo step size
+      int nres_;      // Number of residues defined in this cpout
 };
 
 #endif /* CPOUT_H */

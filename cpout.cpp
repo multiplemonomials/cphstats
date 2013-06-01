@@ -6,13 +6,17 @@
 #include "cpout.h"
 #include "string_manip.h"
 
-CpoutFile::CpoutFile(std::string const& fname) {
-
-   // File type
-   type_ = ASCII;
-   valid_ = true;
-   done_ = false;
-
+CpoutFile::CpoutFile(std::string const& fname) :
+fp_(NULL),
+type_(ASCII),
+valid_(true),
+done_(false),
+orig_ph_(0.0f),
+step_size_(0),
+nres_(0)
+{
+   
+   filename_ = fname;
    if (fname.find_last_of(".") != std::string::npos) {
       // Get the suffix
       std::string sfx = fname.substr(fname.find_last_of('.'));
@@ -24,7 +28,7 @@ CpoutFile::CpoutFile(std::string const& fname) {
          type_ = GZIP;
    }
 
-   // Open up the appropriate file
+   // Open up the appropriate file (ASCII or gzip)
    if (type_ == ASCII) {
       fp_ = fopen(fname.c_str(), "r");
       if (fp_ == NULL) {
@@ -39,21 +43,31 @@ CpoutFile::CpoutFile(std::string const& fname) {
          valid_ = false;
       }
    }
-   
+   // Parse out the first (full) record to determine some information
    char buf[LINEBUF+1];
-   if (Gets(buf, LINEBUF)) {
+   if (valid_ && Gets(buf, LINEBUF)) {
       fprintf(stderr, "Could not read from %s\n", fname.c_str());
       Close();
       valid_ = false;
-  }else{
-      if (strncmp(buf, "Solvent pH:", 11) == 0) {
-         if (sscanf(buf, "Solvent pH: %f\n", &orig_ph_) != 1)
-            fprintf(stderr, "OH NO!\n");
+  }else if (valid_) {
+      if (sscanf(buf, "Solvent pH: %f\n", &orig_ph_) == 1) {
          Gets(buf, LINEBUF);
          if (sscanf(buf, "Monte Carlo step size: %d\n", &step_size_) != 1) {
             fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
             valid_ = false;
             Close();
+         }
+         // I'm satisfied it's a valid cpout here. Eat the next 2 lines then
+         // parse the residues
+         Gets(buf, LINEBUF); Gets(buf, LINEBUF);
+         // Now come the residues
+         Gets(buf, LINEBUF);
+         int res, state;
+         float pH;
+         nres_ = 0;
+         while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
+            nres_++;
+            Gets(buf, LINEBUF);
          }
          fseek(fp_, 0, SEEK_SET);
      }else {
@@ -96,10 +110,27 @@ Record CpoutFile::GetRecord() {
    Record result;
    float pH;
    int res, state;
+   result.full = false;
    if (sscanf(buf, "Solvent pH: %f\n", &pH) == 1) {
       result.full = true;
       result.pH = pH;
-  }else if (sscanf(buf, "Residue %d State: %d\n", &res, &state) >= 2) {
+      Gets(buf, LINEBUF); // Monte Carlo step size
+      Gets(buf, LINEBUF); // Time step:
+      Gets(buf, LINEBUF); // Time:
+      Gets(buf, LINEBUF); // Residue
+      while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
+         RecordPoint pt;
+         pt.state = state; pt.residue = res;
+         result.points.push_back(pt);
+         if (Gets(buf, LINEBUF)) {
+            done_ = true;
+            Close();
+            return result;
+         }
+      }
+      return result;
+  }else {
+      int s = sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH);
       RecordPoint pt;
       pt.state = state; pt.residue = res;
       result.points.push_back(pt);
@@ -108,7 +139,11 @@ Record CpoutFile::GetRecord() {
          Close();
          return result;
       }
-      while (sscanf(buf, "Residue %d State: %d\n", &res, &state) == 2) {
+      // If this is a REMD run, assign the pH
+      if (s == 3)
+         result.pH = pH;
+      // Get more residues from a multi-site move
+      while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
          RecordPoint opt;
          opt.state = state; opt.residue = res;
          result.points.push_back(opt);
@@ -118,11 +153,9 @@ Record CpoutFile::GetRecord() {
             return result;
          }
       }
-  }else {
-      fprintf(stderr, "Unrecognized cpout file!\n");
-      Close();
-      return empty_record;
+      return result;
    }
 
+   // Should never get here, but need this to eliminate compiler warnings
    return empty_record;
 }
