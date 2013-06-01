@@ -3,7 +3,9 @@ cpin.cpp: cpin.h string_manip.h
 cpin.h: constants.h
 cpout.cpp: cpout.h string_manip.h
 cpout.h: constants.h
-main.cpp: cpin.h cpout.h cloptions.h test.h
+main.cpp: cpin.h cpout.h cloptions.h prottraj.h test.h
+prottraj.cpp: prottraj.h constants.h
+prottraj.h: cpin.h cpout.h
 string_manip.cpp: constants.h string_manip.h
 test.cpp: constants.h test.h
-test.h: cloptions.h
+test.h: cloptions.h cpout.h

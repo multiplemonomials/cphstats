@@ -62,7 +62,8 @@ nres_(0)
          Gets(buf, LINEBUF); Gets(buf, LINEBUF);
          // Now come the residues
          Gets(buf, LINEBUF);
-         int res, state;
+         int res;
+         int state;
          float pH;
          nres_ = 0;
          while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
@@ -109,7 +110,8 @@ Record CpoutFile::GetRecord() {
    }
    Record result;
    float pH;
-   int res, state;
+   int res;
+   int state;
    result.full = false;
    if (sscanf(buf, "Solvent pH: %f\n", &pH) == 1) {
       result.full = true;

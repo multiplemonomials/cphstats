@@ -2,6 +2,7 @@
 #include "cpin.h"
 #include "cpout.h"
 #include "cloptions.h"
+#include "prottraj.h"
 #include "test.h"
 
 using namespace std;
@@ -44,8 +45,21 @@ int main(int argc, char**argv) {
 
    printf("Found %d cpouts.\n", (int)clopt.Cpouts().size());
 
-   test_cpouts(cpouts);
+   ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord());
+   for (vector<CpoutFile>::const_iterator it = cpouts.begin();
+               it != cpouts.end(); it++) {
+      stats.LoadCpout(*it);
+   }
+// test_cpouts(cpouts);
 
+   if (clopt.Calcpka()) {
+      if (clopt.Output().empty())
+         stats.PrintCalcpka(stdout);
+      else {
+         FILE *fd = fopen(clopt.Output().c_str(), "w");
+         stats.PrintCalcpka(fd);
+      }
+   }
    printf("All done!\n");
 
    return 0;

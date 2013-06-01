@@ -30,10 +30,11 @@ class CpoutFile {
       CpoutFile(const char*);
       
       // Getters
-      bool Valid()   { return valid_; }
+      bool Valid()   { return valid_;           }
       bool Done()    { return !valid_ || done_; }
-      int Nres()     { return nres_;  }
-      int StepSize() { return step_size_; }
+      int Nres()     { return nres_;            }
+      int StepSize() { return step_size_;       }
+      float pH()     { return orig_ph_;         }
 
       std::string Filename() { return filename_; }
 

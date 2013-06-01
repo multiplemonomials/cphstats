@@ -36,14 +36,14 @@ class TitratableResidue {
       void setResnum(int resnum) { resid_ = resnum; }
       
       // In-line Getters
-      std::string getResname() { return resname_; }
-      int getResnum() { return resid_; }
+      std::string getResname() const { return resname_; }
+      int getResnum() const { return resid_; }
 
       // Determine how many states are present
-      int numStates() { return protonated_.size(); }
+      int numStates() const { return protonated_.size(); }
 
       // Determine if a particular state is protonated or not
-      bool isProtonated(int state) { return protonated_[state]; }
+      bool isProtonated(int state) const { return protonated_[state]; }
 
    private:
       /// How many protons are in each state?
@@ -68,6 +68,11 @@ class Cpin {
 
       // Get the data
       std::vector<TitratableResidue> getResidues();
+
+      // Provide an iterator over the data
+      typedef std::vector<TitratableResidue>::const_iterator ResIterator;
+      ResIterator begin() { return residues_.begin(); }
+      ResIterator end()   { return residues_.end();   }
 
       int getTrescnt() { return trescnt_; }
 
