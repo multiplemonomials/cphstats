@@ -6,14 +6,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include "cloptions.h"
+#include "utilities.h"
 
 using namespace std;
-
-/// Test if a file exists
-bool fexists(string const& fname) {
-   ifstream f(fname.c_str());
-   return f;
-}
 
 CLOptions::CLOptions(int argc, char**argv) :
 verbose_(0),

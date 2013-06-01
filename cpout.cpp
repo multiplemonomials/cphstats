@@ -111,6 +111,7 @@ Record CpoutFile::GetRecord() {
    // Create an empty record for return
    Record empty_record;
    empty_record.pH = 0.0f; empty_record.full = false;
+   empty_record.time_step = 0; empty_record.time = 0.0f;
 
    if (Gets(buf, LINEBUF)) {
       done_ = true;
@@ -126,7 +127,9 @@ Record CpoutFile::GetRecord() {
       result.pH = pH;
       Gets(buf, LINEBUF); // Monte Carlo step size
       Gets(buf, LINEBUF); // Time step:
+      sscanf(buf, "Time step: %d\n", &result.time_step);
       Gets(buf, LINEBUF); // Time:
+      sscanf(buf, "Time: %f\n", &result.time);
       Gets(buf, LINEBUF); // Residue
       while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
          RecordPoint pt;

@@ -17,6 +17,8 @@ typedef struct {
 
 typedef struct {
    std::vector<RecordPoint> points;
+   int time_step;
+   float time;
    float pH;
    bool full;
 } Record;

@@ -4,6 +4,8 @@
 #include "cloptions.h"
 #include "prottraj.h"
 #include "test.h"
+#include "types.h"
+#include "utilities.h"
 
 using namespace std;
 
@@ -50,7 +52,7 @@ int main(int argc, char**argv) {
    } // if clopt.REMDPrefix().empty()
 
    // Set up the cpouts
-   vector<CpoutFile> cpouts;
+   CpoutList cpouts;
    for (CLOptions::cpout_iterator it = clopt.begin(); it != clopt.end(); it++) {
       CpoutFile c = CpoutFile(*it);
       // Skip over invalid cpouts
@@ -73,17 +75,16 @@ int main(int argc, char**argv) {
 
    printf("Analyzing %d cpouts.\n", (int)clopt.Cpouts().size());
 
-// if (!clopt.REMDPrefix().empty()) {
-//    
-// }
+   // Special-case REMD re-ordering
+   if (!clopt.REMDPrefix().empty())
+      return sort_remd_files(cpouts, clopt.REMDPrefix(), clopt.Overwrite());
 
    ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord());
-   for (vector<CpoutFile>::const_iterator it = cpouts.begin();
-               it != cpouts.end(); it++) {
+   for (cpout_iterator it = cpouts.begin(); it != cpouts.end(); it++) {
       stats.LoadCpout(*it);
    }
-// test_cpouts(cpouts);
 
+   // Do the normal calcpka-style output if requested
    if (clopt.Calcpka()) {
       if (clopt.Output().empty())
          stats.PrintCalcpka(stdout);
@@ -92,6 +93,9 @@ int main(int argc, char**argv) {
          stats.PrintCalcpka(fd);
       }
    }
+
+   // Do chunk analysis
+// if (clopt.
    printf("All done!\n");
 
    return 0;
