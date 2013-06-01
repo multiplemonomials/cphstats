@@ -44,6 +44,8 @@ class TitratableResidue {
 
       // Determine if a particular state is protonated or not
       bool isProtonated(int state) const { return protonated_[state]; }
+      // Determine how many protons are in a specific state
+      int numProtons(int state) const { return protcnts_[state]; }
 
    private:
       /// How many protons are in each state?
@@ -63,20 +65,27 @@ class TitratableResidue {
 class Cpin {
    public:
       // Constructors
-      Cpin(const char*);
-      Cpin(std::string const&);
+      Cpin();
 
       // Get the data
-      std::vector<TitratableResidue> getResidues();
+      std::vector<TitratableResidue> getResidues() { return residues_; }
 
       // Provide an iterator over the data
       typedef std::vector<TitratableResidue>::const_iterator ResIterator;
-      ResIterator begin() { return residues_.begin(); }
-      ResIterator end()   { return residues_.end();   }
+      ResIterator begin() const { return residues_.begin(); }
+      ResIterator end()   const { return residues_.end();   }
 
-      int getTrescnt() { return trescnt_; }
+      // Parse the cpin
+      int Parse(const char*);
+      int Parse(std::string const&);
 
-      bool isRead() { return is_valid_; }
+      // Get the number of residues
+      int getTrescnt() const { return trescnt_; }
+
+      // Get the name of the file
+      std::string getFilename() const { return filename_; }
+
+      bool isRead() const { return is_valid_; }
 
    private:
       /// Is our cpin file valid?
@@ -96,6 +105,9 @@ class Cpin {
 
       /// List of titratable residues
       std::vector<TitratableResidue> residues_;
+
+      /// Name of the file
+      std::string filename_;
 
 };
 #endif /* CPIN_H */

@@ -19,6 +19,9 @@ class CLOptions {
       /// This prints out the help message
       void Help();
 
+      /// This prints out the usage statement
+      void Usage();
+
       /// This prints out the version string
       void Version();
 
@@ -26,21 +29,23 @@ class CLOptions {
       int CheckInput();
 
       /// These functions are getters for the various options
-      std::vector<std::string>
-                        Cpouts() { return cpouts_;    }
-      int Verbose()              { return verbose_;   }
-      std::string Cpin()         { return cpin_;      }
-      std::string Output()       { return output_;    }
-      bool Calcpka()             { return do_calcpka_;}
-      std::string CumulativeOutput()  { return cumout_;    }
-      bool doCumulative()        { return cumulative_;}
-      std::string RunningAvgOutput()  { return runavgout_; }
-      std::string Prog()         { return prog_;      }
-      std::string ChunkOutput()  { return chunkout_;  }
-      bool Overwrite()           { return overwrite_; }
-      int RunningAvgWindow()     { return runavgwin_; }
-      int ChunkWindow()          { return chunksize_; }
-      std::string REMDPrefix()   { return reorder_prefix_; }
+      std::vector<std::string> Cpouts(){ return cpouts_;         }
+      int Verbose()                    { return verbose_;        }
+      std::string Cpin()               { return cpin_;           }
+      std::string Output()             { return output_;         }
+      bool Calcpka()                   { return do_calcpka_;     }
+      std::string CumulativeOutput()   { return cumout_;         }
+      bool doCumulative()              { return cumulative_;     }
+      std::string RunningAvgOutput()   { return runavgout_;      }
+      std::string Prog()               { return prog_;           }
+      std::string ChunkOutput()        { return chunkout_;       }
+      bool Overwrite()                 { return overwrite_;      }
+      int RunningAvgWindow()           { return runavgwin_;      }
+      int ChunkWindow()                { return chunksize_;      }
+      int Interval()                   { return interval_;       }
+      bool PrintProtonated()           { return protonated_;     }
+      bool PrintDeprotonated()         { return !protonated_;    }
+      std::string REMDPrefix()         { return reorder_prefix_; }
 
       // Provide an iterator over the cpouts
       typedef std::vector<std::string>::const_iterator cpout_iterator;
@@ -78,6 +83,10 @@ class CLOptions {
       std::string reorder_prefix_;
       /// Do we allow file overwriting?
       bool overwrite_;
+      /// Frequency that we print time series data
+      int interval_;
+      /// Do we print out protonated statistics?
+      bool protonated_;
 
 };
 

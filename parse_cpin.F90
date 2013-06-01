@@ -72,11 +72,11 @@ subroutine parse_cpin(trescnt, protcnt, stateinf, resname, cpin_name, ierr)
    ierr = 0
 
    ! Open the unit, bailing on error
-   open(unit=CPIN_UNIT, file=cpin_name, status='OLD')
+   open(unit=CPIN_UNIT, file=cpin_name, status='OLD', iostat=ierr)
    if (ierr .ne. 0) return
 
    ! Read the namelist, bailing on error
-   read(CPIN_UNIT, nml=cnstph)
+   read(CPIN_UNIT, nml=cnstph, iostat=ierr)
    if (ierr .ne. 0) return
 
    ! If we got this far, then our file is read

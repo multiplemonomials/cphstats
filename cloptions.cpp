@@ -21,7 +21,9 @@ do_calcpka_(true),
 cumulative_(false),
 runavgwin_(0),
 chunksize_(0),
-overwrite_(false)
+overwrite_(false),
+interval_(1),
+protonated_(true)
 {
    
    // Initialize some strings
@@ -154,6 +156,28 @@ overwrite_(false)
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          reorder_prefix_ = std::string(argv[i]);
+     }else if (strncmp("-n", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
+         marked[i] = true;
+         interval_ = atoi(argv[i]);
+     }else if (strncmp("--interval", argv[i], 10) == 0 && strlen(argv[i]) == 10) {
+         marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
+         marked[i] = true;
+         interval_ = atoi(argv[i]);
+     }else if (strncmp("-p", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         marked[i] = true;
+         protonated_ = true;
+     }else if (strncmp("--protonated", argv[i], 12) == 0 && strlen(argv[i]) == 12) {
+         marked[i] = true;
+         protonated_ = true;
+     }else if (strncmp("-d", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         marked[i] = true;
+         protonated_ = false;
+     }else if (strncmp("--deprotonated", argv[i], 14) == 0 && strlen(argv[i]) == 14) {
+         marked[i] = true;
+         protonated_ = false;
      }else if (strncmp("-", argv[i], 1) == 0) {
          fprintf(stderr, "Unrecognized command-line option: %s\n", argv[i]);
          parse_return_ = ERR;
@@ -177,7 +201,7 @@ overwrite_(false)
 
 void CLOptions::Help() {
 
-   printf("Usage: %s [Options] cpout1 [cpout2 [cpout3 ...] ]\n", prog_.c_str());
+   Usage();
    printf("\n");
    printf("General Options:\n");
    printf("    -h, --help     Print this help and exit.\n");
@@ -214,6 +238,15 @@ void CLOptions::Help() {
    printf("                   calcpka-style output file. Options are:\n");
    printf("                      (0) Just print fraction protonated. [Default]\n");
    printf("                      (1) Print everything calcpka prints.\n");
+   printf("    -n INT, --interval INT\n");
+   printf("                   An interval between which to print out time series data\n");
+   printf("                   like `chunks', `cumulative' data, and running averages.\n");
+   printf("    -p, --protonated\n");
+   printf("                   Print out protonation fraction instead of deprotonation\n");
+   printf("                   fraction in time series data (Default behavior).\n");
+   printf("    -d, --deprotonated\n");
+   printf("                   Print out deprotonation fraction instead of protonation\n");
+   printf("                   fraction in time series data.\n");
    printf("\n");
    printf("Analysis Options:\n");
    printf("  These options control which analyses are done. By default, only\n");
@@ -231,18 +264,25 @@ void CLOptions::Help() {
    printf("    --cumulative   Computes the cumulative fraction protonated over the\n");
    printf("                   course of the trajectory.\n");
    printf("    --fix-remd PREFIX\n");
-   printf("                   This option will trigger %s to reassemble the\n",
-          prog_.c_str());
+   printf("                   This option will trigger %s to reassemble the\n", prog_.c_str());
    printf("                   titration data into pH-specific ensembles. This\n");
    printf("                   is an exclusive mode of the program---no other\n");
    printf("                   analyses will be done.\n");
    printf("\n");
    printf("This program analyzes constant pH output files (cpout) from Amber.\n");
-   printf("These output files can be compressed using either bzip2 or gzip\n");
-   printf("compression. The compression will be detected automatically by the\n");
-   printf("file name extension. You must have the bzip2 and gzip headers for this\n");
-   printf("functionality to work.\n");
+   printf("These output files can be compressed using gzip compression. The\n");
+   printf("compression will be detected automatically by the file name extension.\n");
+   printf("You must have the gzip headers for this functionality to work.\n");
    
+   return;
+}
+
+void CLOptions::Usage() {
+   printf("Usage: %s [-O] [-V] [-h] [-i <cpin>] [-o FILE] [-R FILE -r INT]\n", prog_.c_str());
+   printf("             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]\n");
+   printf("             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]\n");
+   printf("             cpout1 [cpout2 [cpout3 ...] ]\n");
+
    return;
 }
 
@@ -257,8 +297,12 @@ int CLOptions::Parse() {
       Help();
    else if (parse_return_ == VERSION)
       Version();
-   else if (parse_return_ == INSUFARGS)
+   else if (parse_return_ == INSUFARGS) {
       fprintf(stderr, "Insufficient arguments!\n");
+      Usage();
+  }else if (parse_return_ == ERR) {
+      Usage();
+   }
 
    return parse_return_;
 }

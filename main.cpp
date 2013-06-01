@@ -14,36 +14,68 @@ int main(int argc, char**argv) {
    if (clopt.Parse())
       return 1;
 
-   test_clopt(clopt);
+// test_clopt(clopt);
 
-   Cpin my_cpin = Cpin(clopt.Cpin());
+   int nres = 0; // number of residues (for consistency tests)
+
+   /* Set up the cpin and print some diagnostic information (only necessary if
+    * we're not fixing REMD files
+    */
+   Cpin my_cpin;
+   if (clopt.REMDPrefix().empty()) {
+      if ( my_cpin.Parse(clopt.Cpin()) )
+         return 1;
    
-   std::vector<TitratableResidue> residues = my_cpin.getResidues();
+      nres = (int) my_cpin.getTrescnt();
 
-//#if 0
-   printf("There are %d titratable residues!\n", (int)residues.size());
-   printf("They are:\n");
-   for (int i = 0; i < my_cpin.getTrescnt(); i++) {
-      printf("\t%s %d (%d states) [ ", residues[i].getResname().c_str(),
-             residues[i].getResnum(), residues[i].numStates());
-      for (int j = 0; j < residues[i].numStates(); j++) {
-         if (residues[i].isProtonated(j))
-            printf("P ");
-         else
-            printf("D ");
+      if (nres <= 0) {
+         fprintf(stderr, "Error: Did not detect any residues in %s!\n",
+                 clopt.Cpin().c_str());
+         return 1;
       }
-      printf("]\n");
-   }
-//#endif
+      printf("There are %d titratable residues defined in %s:\n",
+             nres, my_cpin.getFilename().c_str());
+      printf("They are:\n");
+      for (Cpin::ResIterator it = my_cpin.begin(); it != my_cpin.end(); it++) {
+         printf("\t%3s %-3d (%d states) [ ", it->getResname().c_str(),
+                                          it->getResnum(), it->numStates());
+         for (int j = 0; j < it->numStates(); j++) {
+            if (it->isProtonated(j))
+               printf("P ");
+            else
+               printf("D ");
+         }
+         printf("]\n");
+         }
+   } // if clopt.REMDPrefix().empty()
 
+   // Set up the cpouts
    vector<CpoutFile> cpouts;
    for (CLOptions::cpout_iterator it = clopt.begin(); it != clopt.end(); it++) {
       CpoutFile c = CpoutFile(*it);
+      // Skip over invalid cpouts
+      if (!c.Valid()) {
+         fprintf(stderr, "Error: Cpout file %s is invalid! Skipping.\n", it->c_str());
+         continue;
+      }
+      // For REMD fixing where a cpin is unnecessary, make sure all cpouts have
+      // the same number of residues, so set nres to the first cpout's Nres
+      if (nres <= 0) nres = c.Nres();
+      // Skip over cpouts with a residue mismatch
+      if (c.Nres() != nres) {
+         fprintf(stderr, "Error: Cpout file %s has %d residues. I expected %d.  Skipping.\n",
+                 it->c_str(), c.Nres(), my_cpin.getTrescnt());
+         continue;
+      }
+      fprintf(stdout, "Added [[ %s ]] to cpout list.\n", it->c_str());
       cpouts.push_back(c);
-      fprintf(stdout, "Cpout file %s has %d residues.\n", it->c_str(), c.Nres());
    }
 
-   printf("Found %d cpouts.\n", (int)clopt.Cpouts().size());
+   printf("Analyzing %d cpouts.\n", (int)clopt.Cpouts().size());
+
+// if (!clopt.REMDPrefix().empty()) {
+//    
+// }
 
    ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord());
    for (vector<CpoutFile>::const_iterator it = cpouts.begin();

@@ -57,20 +57,28 @@ nres_(0)
             valid_ = false;
             Close();
          }
-         // I'm satisfied it's a valid cpout here. Eat the next 2 lines then
-         // parse the residues
-         Gets(buf, LINEBUF); Gets(buf, LINEBUF);
-         // Now come the residues
-         Gets(buf, LINEBUF);
-         int res;
-         int state;
-         float pH;
-         nres_ = 0;
-         while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
-            nres_++;
-            Gets(buf, LINEBUF);
+         Gets(buf, LINEBUF); // Time step:
+         Gets(buf, LINEBUF); // Time
+         // Get the starting time
+         if (valid_ && sscanf(buf, "Time: %f\n", &start_time_) != 1) {
+            fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
+            valid_ = false;
+            Close();
          }
-         Rewind();
+
+         if (valid_) {
+            // I'm satisfied it's a valid cpout here; now come the residues
+            Gets(buf, LINEBUF);
+            int res;
+            int state;
+            float pH;
+            nres_ = 0;
+            while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
+               nres_++;
+               Gets(buf, LINEBUF);
+            }
+            Rewind();
+         }
      }else {
          fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
          Close();

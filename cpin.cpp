@@ -8,15 +8,23 @@
 #include "string_manip.h"
 
 /// Cpin constructor from a char array
-Cpin::Cpin(const char* cpinname) :
+Cpin::Cpin() :
 is_valid_(false)
-{
-
+{ }
+   
+int Cpin::Parse(const char* cpinname) {
+   filename_ = std::string(cpinname);
    char my_fname[FN_LEN];
    strncpy(my_fname, cpinname, (size_t)FN_LEN);
    char resname[TITR_RES_C+1][40];
    int ierr;
    parse_cpin_(&trescnt_, protcnt_, stateinf_, resname, my_fname, &ierr);
+
+   // Error catch
+   if (ierr != 0) {
+      fprintf(stderr, "Error: Could not open or parse %s for reading!\n", cpinname);
+      return ierr;
+   }
 
    for (int i = 0; i <= trescnt_; i++) {
       char r[41];
@@ -25,43 +33,7 @@ is_valid_(false)
       resname_.push_back(std::string(r));
    }
 
-   if (ierr != 0)
-      fprintf(stderr, "Error: Could not open %s for reading!\n", cpinname);
-   else
-      is_valid_ = true;
-}
-
-/// Cpin constructor from a string
-Cpin::Cpin(std::string const& cpinname) :
-is_valid_(false)
-{
-   char my_fname[FN_LEN];
-   char resname[TITR_RES_C+1][40];
-   strncpy(my_fname, cpinname.c_str(), (size_t)FN_LEN);
-   int ierr;
-   parse_cpin_(&trescnt_, protcnt_, stateinf_, resname, my_fname, &ierr);
-
-   for (int i = 0; i <= trescnt_; i++) {
-      char r[41];
-      strncpy(r, resname[i], 40);
-      int last_item = 0;
-      for (int j = 0; j < 40; j++)
-         if (r[j] != ' ')
-            last_item = j+1;
-      r[last_item] = '\0';
-      resname_.push_back(std::string(r));
-   }
-
-   if (ierr != 0)
-      fprintf(stderr, "Error: Could not open %s for reading!\n", my_fname);
-   else
-      is_valid_ = true;
-}
-
-/// Returns a list of titratable residues
-std::vector<TitratableResidue> Cpin::getResidues() {
-   
-   if (!is_valid_ || !residues_.empty()) return residues_;
+   is_valid_ = true;
 
    // Now define all of the residues
    for (int i = 0; i < trescnt_; i++) {
@@ -73,7 +45,11 @@ std::vector<TitratableResidue> Cpin::getResidues() {
       residues_.push_back( TitratableResidue(resname_[i+1], res_protcnt) );
    }
 
-   return residues_;
+   return 0;
+}
+
+int Cpin::Parse(std::string const& cpinname) {
+   return Parse(cpinname.c_str());
 }
 
 /// Constructor for TitratableResidue

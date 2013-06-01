@@ -30,11 +30,12 @@ class CpoutFile {
       CpoutFile(const char*);
       
       // Getters
-      bool Valid()   { return valid_;           }
-      bool Done()    { return !valid_ || done_; }
-      int Nres()     { return nres_;            }
-      int StepSize() { return step_size_;       }
-      float pH()     { return orig_ph_;         }
+      bool Valid() const     { return valid_;           }
+      bool Done() const      { return !valid_ || done_; }
+      int Nres() const       { return nres_;            }
+      int StepSize() const   { return step_size_;       }
+      float pH() const       { return orig_ph_;         }
+      float startTime() const{ return start_time_;      }
 
       std::string Filename() { return filename_; }
 
@@ -66,11 +67,12 @@ class CpoutFile {
       FileType type_;
 
       std::string filename_; // Original file name
-      bool valid_; // Is this a valid file?
-      bool done_;  // Is this file done reading?
-      float orig_ph_; // pH on the opening full record
-      int step_size_; // Monte carlo step size
-      int nres_;      // Number of residues defined in this cpout
+      bool valid_;       // Is this a valid file?
+      bool done_;        // Is this file done reading?
+      float orig_ph_;    // pH on the opening full record
+      int step_size_;    // Monte carlo step size
+      int nres_;         // Number of residues defined in this cpout
+      float start_time_; // The time in the first full record
 };
 
 #endif /* CPOUT_H */

@@ -57,7 +57,7 @@ void ProtTraj::PrintCalcpka(FILE *fd, const int start) {
                                   rit->isProtonated(statelist_[i][j]));
          long long int protadd = (long long int) (rit->isProtonated(statelist_[i][j]));
          nprot[j] += protadd;
-         totprot += protadd;
+         totprot += (long long int) rit->numProtons(statelist_[i][j]);
          j++;
       }
       // Reassign the last point to the current one before incrementing
