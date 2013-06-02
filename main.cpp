@@ -110,6 +110,12 @@ int main(int argc, char**argv) {
       stats.PrintCumulative(clopt.CumulativeOutput(), clopt.Interval(),
                         clopt.PrintProtonated() && !clopt.pKa(), clopt.pKa());
 
+   // Do running averages
+   if (clopt.RunningAvgWindow() > 0)
+      stats.PrintRunningAvg(clopt.RunningAvgWindow(), clopt.Interval(), 
+                        clopt.RunningAvgOutput(),
+                        clopt.PrintProtonated() && !clopt.pKa(), clopt.pKa());
+
    printf("All done!\n");
 
    return 0;

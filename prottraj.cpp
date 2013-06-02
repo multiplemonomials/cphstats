@@ -5,8 +5,8 @@
 #include "constants.h"
 
 // Some simple binary sorting macros
-#define MAX(a,b) a > b ? a : b
-#define MIN(a,b) a > b ? b : a
+#define MAX(a,b) (a > b ? a : b)
+#define MIN(a,b) (a > b ? b : a)
 
 ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin) :
 cpin_(NULL),
@@ -97,8 +97,11 @@ void ProtTraj::PrintChunks(const int window, std::string const& fname,
    // Open up the file and write a header
    FILE *fp = fopen(fname.c_str(), "w");
    fprintf(fp, "#Time step ");
-   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++)
-      fprintf(fp, "%3s %4d ", rit->getResname().c_str(), rit->getResnum());
+   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+      char buf[LINEBUF];
+      sprintf(buf, "%s %d", rit->getResname().c_str(), rit->getResnum());
+      fprintf(fp, "%8s ", buf);
+   }
    fprintf(fp, "Total Frac. Prot.\n");
 
    int interval = window / time_step_;
@@ -125,7 +128,7 @@ void ProtTraj::PrintChunks(const int window, std::string const& fname,
             fprintf(fp, "%8.5lf ", fracprot);
         }else if (print_pka) {
             // We want the pKa
-            double pKa = pH_ = log10( (1.0 - fracprot) / fracprot );
+            double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
             fprintf(fp, "%8.4lf ", pKa);
         }else {
             // We want the fraction deprotonated
@@ -148,8 +151,11 @@ void ProtTraj::PrintCumulative(std::string const& fname, const int interval,
    // Open up the file and write a header
    FILE *fp = fopen(fname.c_str(), "w");
    fprintf(fp, "#Time step ");
-   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++)
-      fprintf(fp, "%3s %4d ", rit->getResname().c_str(), rit->getResnum());
+   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+      char buf[LINEBUF];
+      sprintf(buf, "%s %d", rit->getResname().c_str(), rit->getResnum());
+      fprintf(fp, "%8s ", buf);
+   }
    fprintf(fp, "Total Frac. Prot.\n");
 
    // Now go through the trajectory
@@ -180,7 +186,7 @@ void ProtTraj::PrintCumulative(std::string const& fname, const int interval,
                fprintf(fp, "%8.5lf ", fracprot);
            }else if (print_pka) {
                // We want the pKa
-               double pKa = pH_ = log10( (1.0 - fracprot) / fracprot );
+               double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
                fprintf(fp, "%8.4lf ", pKa);
            }else {
                // We want the fraction deprotonated
@@ -191,6 +197,61 @@ void ProtTraj::PrintCumulative(std::string const& fname, const int interval,
          fprintf(fp, "%17.6f\n", (double)totprot / (double)(i+1));
       }
       c++; // heh
+   }
+
+   fclose(fp);
+   return;
+}
+
+void ProtTraj::PrintRunningAvg(const int window, const int interval,
+                               std::string const& fname, const bool print_prot,
+                               const bool print_pka) {
+   int halfwin = window / 2;
+
+   // Open the file for writing and print a header
+   FILE *fp = fopen(fname.c_str(), "w");
+   fprintf(fp, "#Time step ");
+   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+      char buf[LINEBUF];
+      sprintf(buf, "%s %d", rit->getResname().c_str(), rit->getResnum());
+      fprintf(fp, "%8s ", buf);
+   }
+   fprintf(fp, "Total Frac. Prot.\n");
+
+   for (int i = 0; i < nframes_; i+= interval/time_step_) {
+      std::vector<long long int> nprot(nres_, 0ll);
+      long long int totprot = 0ll;
+      // Loop over all frames we should include here
+      for (int j = MAX(0, i-halfwin); j < MIN(nframes_, i+halfwin); j++) {
+         // Loop over every residue
+         int k = 0;
+         for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+            long long int protadd = (long long int) (rit->isProtonated(statelist_[j][k]));
+            nprot[k] += protadd;
+            totprot += (long long int) rit->numProtons(statelist_[j][k]);
+            k++;
+         }
+      }
+      // Print this frame to the output file
+      int j = 0;
+      int n = MIN(nframes_, i+halfwin) - MAX(0, i-halfwin);
+      fprintf(fp, "%10i ", time_step_*i);
+      for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+         double fracprot = (double)nprot[j] / (double)n;
+         if (print_prot) {
+            // We want the fraction protonated
+            fprintf(fp, "%8.5lf ", fracprot);
+        }else if (print_pka) {
+            // We want the pKa
+            double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
+            fprintf(fp, "%8.4lf ", pKa);
+        }else {
+            // We want the fraction deprotonated
+            fprintf(fp, "%8.5lf ", 1.0-fracprot);
+         }
+         j++;
+     }
+     fprintf(fp, "%17.6f\n", (double)totprot / (double)n);
    }
 
    fclose(fp);

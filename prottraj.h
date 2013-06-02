@@ -30,7 +30,13 @@ class ProtTraj {
 
       // Prints the cumulative averages for each residue during the course of
       // the simulation
-      void PrintCumulative(std::string const&, const int, const bool, const bool);
+      void PrintCumulative(std::string const&, const int,
+                           const bool, const bool);
+
+      // Prints the running averages for each residue during the course of the
+      // simulation
+      void PrintRunningAvg(const int, const int, std::string const&,
+                           const bool, const bool);
 
    private:
       // New type: protonation state vector
