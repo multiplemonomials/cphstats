@@ -10,8 +10,10 @@ parser.add_option('-d', '--debug', dest='debug', default=False,
                   action='store_true', help='Trigger the debug flags.')
 parser.add_option('-n', '--no-opt', dest='opt', default=True,
                   action='store_false', help='Disable compiler optimizations.')
-parser.add_option('-p', '--program', dest='prog', default='cphutil',
+parser.add_option('-p', '--program', dest='prog', default='cphstats',
                   help='The name of the resulting program. Default %default.')
+parser.add_option('--prefix', dest='prefix', default='.',
+                  help='Installation destination. Default is current directory')
 
 
 opt, arg = parser.parse_args()
@@ -79,7 +81,7 @@ else:
 
 confighopts = dict(cpp=cpp, f90=f90, ld=ld, ldflags=' '.join(ldflags),
                cppflags=' '.join(cppflags), f90flags=' '.join(f90flags),
-               confline=' '.join(sys.argv), prog=opt.prog)
+               confline=' '.join(sys.argv), prog=opt.prog, prefix=opt.prefix)
 f.write("""# configured with [[ %(confline)s ]]
 
 # Compilers
@@ -94,5 +96,6 @@ LDFLAGS = %(ldflags)s
 
 # Name of the program
 PROGNAME = %(prog)s
+PREFIX = %(prefix)s
 """ % confighopts)
 f.close()

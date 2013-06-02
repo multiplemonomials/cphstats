@@ -1,7 +1,7 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "0.3"
+#define VERSION_STR "0.4"
 
 #include <cstring>
 #include <string>

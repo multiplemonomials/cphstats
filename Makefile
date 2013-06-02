@@ -1,12 +1,20 @@
 include config.h
 
-.NOTPARALLEL:clean install
+.NOTPARALLEL:clean install all
 
 OBJS = main.o cpin.o parse_cpin.o string_manip.o cloptions.o test.o cpout.o \
        prottraj.o utilities.o
 
-install: $(OBJS)
+all: $(PROGNAME)
+
+$(PROGNAME): $(OBJS)
 	$(LD) $(LDFLAGS) -o $(PROGNAME) $(OBJS)
+
+install: $(PROGNAME)
+	/bin/mv $(PROGNAME) $(PREFIX)/bin
+
+uninstall:
+	/bin/rm -f $(PREFIX)/bin/$(PROGNAME)
 
 .SUFFIXES: .F90 .cpp .o
 
@@ -22,6 +30,6 @@ depends::
 clean:
 	/bin/rm -f $(OBJS)
 
-new: clean install
+new: clean $(PROGNAME)
 
 include depends
