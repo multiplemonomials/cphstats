@@ -16,6 +16,12 @@ int main(int argc, char**argv) {
    if (clopt.Parse())
       return 1;
 
+   // Check the input
+   if (clopt.CheckInput()) {
+      fprintf(stderr, "Error: Input errors detected! See messages above.\n");
+      return 1;
+   }
+
 // test_clopt(clopt);
 
    int nres = 0; // number of residues (for consistency tests)
@@ -98,6 +104,12 @@ int main(int argc, char**argv) {
    if (clopt.ChunkWindow() > 0)
       stats.PrintChunks(clopt.ChunkWindow(), clopt.ChunkOutput(),
                         clopt.PrintProtonated() && !clopt.pKa(), clopt.pKa());
+   
+   // Do cumulative analysis
+   if (clopt.doCumulative())
+      stats.PrintCumulative(clopt.CumulativeOutput(), clopt.Interval(),
+                        clopt.PrintProtonated() && !clopt.pKa(), clopt.pKa());
+
    printf("All done!\n");
 
    return 0;

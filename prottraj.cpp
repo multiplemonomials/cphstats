@@ -117,7 +117,7 @@ void ProtTraj::PrintChunks(const int window, std::string const& fname,
       }
       // Now write the information
       int j = 0;
-      fprintf(fp, "%10i ", first + interval / 2);
+      fprintf(fp, "%10i ", time_step_*(first + interval / 2));
       for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
          double fracprot = (double)nprot[j] / (double)interval;
          if (print_prot) {
@@ -138,6 +138,61 @@ void ProtTraj::PrintChunks(const int window, std::string const& fname,
    }
 
    // Now that I'm here (and done), close the file
+   fclose(fp);
+   return;
+}
+
+void ProtTraj::PrintCumulative(std::string const& fname, const int interval,
+                               const bool print_prot, const bool print_pka) {
+   
+   // Open up the file and write a header
+   FILE *fp = fopen(fname.c_str(), "w");
+   fprintf(fp, "#Time step ");
+   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++)
+      fprintf(fp, "%3s %4d ", rit->getResname().c_str(), rit->getResnum());
+   fprintf(fp, "Total Frac. Prot.\n");
+
+   // Now go through the trajectory
+   std::vector<long long int> nprot(nres_, 0ll);
+   long long int totprot = 0ll;
+   int c = 0; // simple counter
+   for (int i = 0; i < nframes_; i++) {
+      
+      { // scope this
+      int j = 0;
+      for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+         long long int protadd = (long long int) (rit->isProtonated(statelist_[i][j]));
+         nprot[j] += protadd;
+         totprot += (long long int) rit->numProtons(statelist_[i][j]);
+         j++;
+      }
+      }
+
+      if (c * time_step_ >= interval) {
+         c = 0;
+         // Now we print a point
+         int j = 0;
+         fprintf(fp, "%10i ", i*time_step_);
+         for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+            double fracprot = (double)nprot[j] / (double)(i+1);
+            if (print_prot) {
+               // We want the fraction protonated
+               fprintf(fp, "%8.5lf ", fracprot);
+           }else if (print_pka) {
+               // We want the pKa
+               double pKa = pH_ = log10( (1.0 - fracprot) / fracprot );
+               fprintf(fp, "%8.4lf ", pKa);
+           }else {
+               // We want the fraction deprotonated
+               fprintf(fp, "%8.5lf ", 1.0-fracprot);
+            }
+            j++;
+         }
+         fprintf(fp, "%17.6f\n", (double)totprot / (double)(i+1));
+      }
+      c++; // heh
+   }
+
    fclose(fp);
    return;
 }

@@ -28,6 +28,10 @@ class ProtTraj {
       // of given size (in time steps)
       void PrintChunks(const int, std::string const&, const bool, const bool);
 
+      // Prints the cumulative averages for each residue during the course of
+      // the simulation
+      void PrintCumulative(std::string const&, const int, const bool, const bool);
+
    private:
       // New type: protonation state vector
       typedef std::vector<int> ProtVector;
