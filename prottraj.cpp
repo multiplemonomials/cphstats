@@ -4,11 +4,16 @@
 #include "prottraj.h"
 #include "constants.h"
 
+// Some simple binary sorting macros
+#define MAX(a,b) a > b ? a : b
+#define MIN(a,b) a > b ? b : a
+
 ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin) :
 cpin_(NULL),
 nres_(0),
 pH_(0.0f),
-nframes_(0)
+nframes_(0),
+time_step_(0)
 {
    cpin_ = cpin;
    nres_ = cpin->getTrescnt();
@@ -27,6 +32,7 @@ nframes_(0)
 
 /// Loads a full cpout file point by point
 void ProtTraj::LoadCpout(CpoutFile cpout) {
+   if (time_step_ == 0) time_step_ = cpout.StepSize();
    while (!cpout.Done())
       AddPoint(cpout.GetRecord());
 }
@@ -83,4 +89,55 @@ void ProtTraj::PrintCalcpka(FILE *fd, const int start) {
 
 void ProtTraj::PrintCalcpka(FILE *fd) {
    PrintCalcpka(fd, 0);
+}
+
+void ProtTraj::PrintChunks(const int window, std::string const& fname,
+                           const bool print_prot, const bool print_pka) {
+
+   // Open up the file and write a header
+   FILE *fp = fopen(fname.c_str(), "w");
+   fprintf(fp, "#Time step ");
+   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++)
+      fprintf(fp, "%3s %4d ", rit->getResname().c_str(), rit->getResnum());
+   fprintf(fp, "Total Frac. Prot.\n");
+
+   int interval = window / time_step_;
+   int first = 0;
+   while (first + interval <= nframes_) {
+      std::vector<long long int> nprot(nres_, 0ll);
+      long long int totprot = 0ll;
+      for (int i = first; i < first + interval; i++) {
+         int j = 0;
+         for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+            long long int protadd = (long long int) (rit->isProtonated(statelist_[i][j]));
+            nprot[j] += protadd;
+            totprot += (long long int) rit->numProtons(statelist_[i][j]);
+            j++;
+         }
+      }
+      // Now write the information
+      int j = 0;
+      fprintf(fp, "%10i ", first + interval / 2);
+      for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+         double fracprot = (double)nprot[j] / (double)interval;
+         if (print_prot) {
+            // We want the fraction protonated
+            fprintf(fp, "%8.5lf ", fracprot);
+        }else if (print_pka) {
+            // We want the pKa
+            double pKa = pH_ = log10( (1.0 - fracprot) / fracprot );
+            fprintf(fp, "%8.4lf ", pKa);
+        }else {
+            // We want the fraction deprotonated
+            fprintf(fp, "%8.5lf ", 1.0-fracprot);
+         }
+         j++;
+      }
+      fprintf(fp, "%17.6f\n", (double)totprot / (double)interval);
+      first += interval;
+   }
+
+   // Now that I'm here (and done), close the file
+   fclose(fp);
+   return;
 }

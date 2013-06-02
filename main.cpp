@@ -95,7 +95,9 @@ int main(int argc, char**argv) {
    }
 
    // Do chunk analysis
-// if (clopt.
+   if (clopt.ChunkWindow() > 0)
+      stats.PrintChunks(clopt.ChunkWindow(), clopt.ChunkOutput(),
+                        clopt.PrintProtonated() && !clopt.pKa(), clopt.pKa());
    printf("All done!\n");
 
    return 0;

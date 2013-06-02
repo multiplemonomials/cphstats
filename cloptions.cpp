@@ -19,7 +19,8 @@ chunksize_(0),
 overwrite_(false),
 interval_(1),
 protonated_(true),
-time_step_(0.002f)
+time_step_(0.002f),
+pKa_(false)
 {
    
    // Initialize some strings
@@ -184,6 +185,12 @@ time_step_(0.002f)
      }else if (strncmp("--deprotonated", argv[i], 14) == 0 && strlen(argv[i]) == 14) {
          marked[i] = true;
          protonated_ = false;
+     }else if (strncmp("-a", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         marked[i] = true;
+         pKa_ = true;
+     }else if (strncmp("--pKa", argv[i], 5) == 0 && strlen(argv[i]) == 5) {
+         marked[i] = true;
+         pKa_ = true;
      }else if (strncmp("-", argv[i], 1) == 0) {
          fprintf(stderr, "Unrecognized command-line option: %s\n", argv[i]);
          parse_return_ = ERR;
@@ -257,6 +264,9 @@ void CLOptions::Help() {
    printf("    -d, --deprotonated\n");
    printf("                   Print out deprotonation fraction instead of protonation\n");
    printf("                   fraction in time series data.\n");
+   printf("    -a, --pKa      Print predicted pKas (via Henderson-Hasselbalch) in place\n");
+   printf("                   of fraction (de)protonated. This option overrides all\n");
+   printf("                   instances of -p/-d described above. NOT default behavior.\n");
    printf("\n");
    printf("Analysis Options:\n");
    printf("  These options control which analyses are done. By default, only\n");
@@ -328,6 +338,17 @@ int CLOptions::CheckInput() {
       fprintf(stderr, "Error: --chunk window must be non-negative!\n");
       inerr = 1;
    }
+
+   if (time_step_ <= 0) {
+      fprintf(stderr, "Error: --time-step must be a positive number!\n");
+      inerr = 1;
+   }
+
+   if (interval_ <= 0) {
+      fprintf(stderr, "Error: -n/--interval must be a positive integer!\n");
+      inerr = 1;
+   }
+
    // Make sure no files exist that we want to overwrite
    if (runavgwin_ > 0 && !overwrite_)
       if (fexists(runavgout_)) {
@@ -352,6 +373,15 @@ int CLOptions::CheckInput() {
          fprintf(stderr, "Error: %s exists; not overwriting.\n", cumout_.c_str());
          inerr = 1;
       }
+
+   // Make sure we provided a prefix and didn't accidentally just dump a bunch
+   // of cpout files on the command line without a prefix
+   if (!reorder_prefix_.empty() && fexists(reorder_prefix_)) {
+      fprintf(stderr, "--------| Interpreting %s as the new REMD file prefix. If this is\n", 
+              reorder_prefix_.c_str());
+      fprintf(stderr, "Warning | a cpout file, kill this program and re-run with a correct\n");
+      fprintf(stderr, "--------| REMD file prefix.\n");
+   }
 
    return inerr;
 }

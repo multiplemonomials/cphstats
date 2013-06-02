@@ -24,6 +24,10 @@ class ProtTraj {
       void PrintCalcpka(FILE*);
       void PrintCalcpka(FILE*, const int);
 
+      // Prints the desired values for each residue for chunks of the simulation
+      // of given size (in time steps)
+      void PrintChunks(const int, std::string const&, const bool, const bool);
+
    private:
       // New type: protonation state vector
       typedef std::vector<int> ProtVector;
@@ -46,5 +50,8 @@ class ProtTraj {
 
       // Number of frames
       long long int nframes_;
+
+      // Monte carlo time step
+      int time_step_;
 };
 #endif /* PROTTRAJ_H */
