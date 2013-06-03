@@ -108,7 +108,7 @@ pKa_(false)
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         chunkout_ = std::string(argv[i]);
+         cumout_ = std::string(argv[i]);
      }else if (strncmp("--calcpka", argv[i], 9) == 0 && strlen(argv[i]) == 9) {
          marked[i] = true;
          do_calcpka_ = true;
