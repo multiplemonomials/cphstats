@@ -97,6 +97,7 @@ int main(int argc, char**argv) {
       else {
          FILE *fd = fopen(clopt.Output().c_str(), "w");
          stats.PrintCalcpka(fd);
+         fclose(fd);
       }
    }
 
