@@ -38,6 +38,9 @@ class ProtTraj {
       void PrintRunningAvg(const int, const int, std::string const&,
                            const bool, const bool);
 
+      // Prints a summary of the population of each residue in each state
+      void PrintProtPop(std::string const&);
+
    private:
       // New type: protonation state vector
       typedef std::vector<int> ProtVector;
@@ -63,5 +66,12 @@ class ProtTraj {
 
       // Monte carlo time step
       int time_step_;
+
+      typedef struct {
+         std::vector<long long int> state_cnt;
+         std::vector<int> prot_cnt;
+         int nstates;
+      } StateCount;
+      
 };
 #endif /* PROTTRAJ_H */

@@ -31,6 +31,10 @@ int main(int argc, char**argv) {
     */
    Cpin my_cpin;
    if (clopt.REMDPrefix().empty()) {
+      if ( clopt.Cpin().empty() ) {
+         fprintf(stderr, "Error: No cpin file provided!\n");
+         return 1;
+      }
       if ( my_cpin.Parse(clopt.Cpin()) )
          return 1;
    
@@ -116,6 +120,10 @@ int main(int argc, char**argv) {
       stats.PrintRunningAvg(clopt.RunningAvgWindow(), clopt.Interval(), 
                         clopt.RunningAvgOutput(),
                         clopt.PrintProtonated() && !clopt.pKa(), clopt.pKa());
+
+   // Do protonation fraction dump
+   if (clopt.Protonation().size() > 0)
+      stats.PrintProtPop(clopt.Protonation());
 
    printf("All done!\n");
 

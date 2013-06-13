@@ -87,10 +87,12 @@ void ProtTraj::PrintCalcpka(FILE *fd, const int start) {
    return;
 }
 
+/// Prints the calcpka-style output for the entire simulation
 void ProtTraj::PrintCalcpka(FILE *fd) {
    PrintCalcpka(fd, 0);
 }
 
+/// Print a time series of the desired properties in 'chunks' of the simulation
 void ProtTraj::PrintChunks(const int window, std::string const& fname,
                            const bool print_prot, const bool print_pka) {
 
@@ -145,6 +147,7 @@ void ProtTraj::PrintChunks(const int window, std::string const& fname,
    return;
 }
 
+/// Prints a cumulative running average time series of the desired property
 void ProtTraj::PrintCumulative(std::string const& fname, const int interval,
                                const bool print_prot, const bool print_pka) {
    
@@ -203,6 +206,7 @@ void ProtTraj::PrintCumulative(std::string const& fname, const int interval,
    return;
 }
 
+/// Print the rolling/running average time series with a given window
 void ProtTraj::PrintRunningAvg(const int window, const int interval,
                                std::string const& fname, const bool print_prot,
                                const bool print_pka) {
@@ -256,4 +260,66 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
 
    fclose(fp);
    return;
+}
+
+/** Print the population fraction of the entire simulation for each state and
+  * each residue
+  */
+void ProtTraj::PrintProtPop(std::string const& fname) {
+   // Set up the table of populations, initializing everything to zero
+   std::vector<StateCount> pop_counts;
+   // Now loop through every state and every residue, building pop_counts
+   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+      StateCount newstate;
+      newstate.nstates = 0;
+      for (int i = 0; i < rit->numStates(); i++) {
+         newstate.state_cnt.push_back(0ll);
+         newstate.prot_cnt.push_back(rit->numProtons(i));
+         newstate.nstates++;
+      }
+      pop_counts.push_back(newstate);
+   }
+
+   // Now loop through the entire trajectory, building the population list
+   for (int i = 0; i < nframes_; i++) {
+      ProtVector curst = statelist_[i];
+      for (int j = 0; j < nres_; j++)
+         pop_counts[j].state_cnt[ statelist_[i][j] ] += 1ll;
+   }
+
+   // Now print out the population counts
+   FILE *fp = fopen(fname.c_str(), "w");
+   if (fp == NULL) {
+      fprintf(stderr, "Error: Could not open [ %s ] for writing!\n", fname.c_str());
+      return;
+   }
+
+   // Get the max number of states
+   int maxst = cpin_->getResidues()[0].numStates();
+   for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++)
+      maxst = MAX(maxst, rit->numStates());
+
+   // Write the header
+   fprintf(fp, "%17s ", "Residue Number");
+   for (int i = 0; i < maxst; i++)
+      fprintf(fp, "%9s%3d ", "State", i);
+   fprintf(fp, "\n------------------");
+   for (int i = 0; i < maxst; i++)
+      fprintf(fp, "-------------");
+   fprintf(fp, "\n");
+
+   // Now loop through every residue and print out the populations
+   for (int i = 0; i < nres_; i++) {
+      char hdr[20];
+      sprintf(hdr, "Residue: %s %d", cpin_->getResidues()[i].getResname().c_str(),
+                             cpin_->getResidues()[i].getResnum());
+      fprintf(fp, "%-17s ", hdr);
+      for (int j = 0; j < pop_counts[i].nstates; j++) {
+         double pop = (double) pop_counts[i].state_cnt[j] / (double) nframes_;
+         fprintf(fp, "%8.6lf (%1i) ", pop, pop_counts[i].prot_cnt[j]);
+      }
+      fprintf(fp, "\n");
+   }
+
+   fclose(fp);
 }

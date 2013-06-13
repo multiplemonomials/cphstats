@@ -191,6 +191,11 @@ pKa_(false)
      }else if (strncmp("--pKa", argv[i], 5) == 0 && strlen(argv[i]) == 5) {
          marked[i] = true;
          pKa_ = true;
+     }else if (strncmp("--protonation", argv[i], 13) == 0 && strlen(argv[i]) == 13) {
+         marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
+         marked[i] = true;
+         protonation_ = std::string(argv[i]);
      }else if (strncmp("-", argv[i], 1) == 0) {
          fprintf(stderr, "Unrecognized command-line option: %s\n", argv[i]);
          parse_return_ = ERR;
@@ -246,6 +251,9 @@ void CLOptions::Help() {
    printf("    --cumulative-out FILE\n");
    printf("                   Output file where the cumulative protonated fraction\n");
    printf("                   is printed. Default is [cumulative.dat]\n");
+   printf("    --protonation FILE\n");
+   printf("                   Output file where protonation state populations are\n");
+   printf("                   printed for every state of every residue.\n");
    printf("\n");
    printf("Output Options:\n");
    printf("  These options modify how the output files will appear\n");
@@ -301,6 +309,7 @@ void CLOptions::Usage() {
    printf("Usage: %s [-O] [-V] [-h] [-i <cpin>] [-t] [-o FILE] [-R FILE -r INT]\n", prog_.c_str());
    printf("             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]\n");
    printf("             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]\n");
+   printf("             [--protonation FILE]\n");
    printf("             cpout1 [cpout2 [cpout3 ...] ]\n");
 
    return;
@@ -371,6 +380,12 @@ int CLOptions::CheckInput() {
    if (cumulative_ && !overwrite_)
       if (fexists(cumout_)) {
          fprintf(stderr, "Error: %s exists; not overwriting.\n", cumout_.c_str());
+         inerr = 1;
+      }
+
+   if (!protonation_.empty() && !overwrite_)
+      if (fexists(protonation_)) {
+         fprintf(stderr, "Error: %s exists; not overwriting.\n", protonation_.c_str());
          inerr = 1;
       }
 

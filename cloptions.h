@@ -1,7 +1,7 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "0.5"
+#define VERSION_STR "0.6"
 
 #include <cstring>
 #include <string>
@@ -48,6 +48,7 @@ class CLOptions {
       std::string REMDPrefix() const          { return reorder_prefix_; }
       float TimeStep() const                  { return time_step_;      }
       bool pKa() const                        { return pKa_;            }
+      std::string Protonation() const         { return protonation_;    }
 
       // Provide an iterator over the cpouts
       typedef std::vector<std::string>::const_iterator cpout_iterator;
@@ -93,6 +94,8 @@ class CLOptions {
       float time_step_;
       /// Do we put predicted pKas for time series?
       bool pKa_;
+      /// Protonated fraction output file
+      std::string protonation_;
 
 };
 
