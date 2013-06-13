@@ -1,11 +1,13 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "0.6"
+#define VERSION_STR "0.7"
 
 #include <cstring>
 #include <string>
 #include <vector>
+
+#include "conprob.h"
 
 class CLOptions {
    public:
@@ -55,6 +57,10 @@ class CLOptions {
       cpout_iterator begin()     { return cpouts_.begin(); }
       cpout_iterator end()       { return cpouts_.end();   }
 
+      typedef std::vector<ConditionalProb>::const_iterator prob_iterator;
+      prob_iterator condbegin()  { return condprobs_.begin(); }
+      prob_iterator condend()    { return condprobs_.end();   }
+
    private:
       /// Name of the input cpin file
       std::string cpin_;
@@ -96,6 +102,8 @@ class CLOptions {
       bool pKa_;
       /// Protonated fraction output file
       std::string protonation_;
+      /// List of conditional probabilities
+      std::vector<ConditionalProb> condprobs_;
 
 };
 

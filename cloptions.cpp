@@ -1,6 +1,5 @@
 // cloptions.cpp: Manage the command-line options and parsing
 
-
 #include <fstream>
 #include <cstring>
 #include <cstdlib>
@@ -296,6 +295,13 @@ void CLOptions::Help() {
    printf("                   titration data into pH-specific ensembles. This\n");
    printf("                   is an exclusive mode of the program---no other\n");
    printf("                   analyses will be done.\n");
+   printf("    -c CONDITIONAL, --conditional CONDITIONAL\n");
+   printf("                   Evaluates conditional probabilities. CONDITIONAL should be a\n");
+   printf("                   string of the format:\n");
+   printf("                         <resid>:<state>,<resid>:<state>,...\n");
+   printf("                   Where <resid> is the residue number in the prmtop (NOT the\n");
+   printf("                   cpin) and <state> is either the state number or (d)eprotonated\n");
+   printf("                   or (p)rotonated, case-insensitive\n");
    printf("\n");
    printf("This program analyzes constant pH output files (cpout) from Amber.\n");
    printf("These output files can be compressed using gzip compression. The\n");
@@ -309,7 +315,7 @@ void CLOptions::Usage() {
    printf("Usage: %s [-O] [-V] [-h] [-i <cpin>] [-t] [-o FILE] [-R FILE -r INT]\n", prog_.c_str());
    printf("             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]\n");
    printf("             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]\n");
-   printf("             [--protonation FILE]\n");
+   printf("             [--protonation FILE] [-c CONDITION -c CONDITION -c ...]\n");
    printf("             cpout1 [cpout2 [cpout3 ...] ]\n");
 
    return;

@@ -1,4 +1,4 @@
-// Set up vectors of all of the protonation states for each snapshot
+// prottraj.cpp: Set up vectors of all of the protonation states for each snapshot
 
 #include <cmath> // log10
 #include "prottraj.h"

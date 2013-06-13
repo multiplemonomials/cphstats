@@ -68,7 +68,7 @@ class Cpin {
       Cpin();
 
       // Get the data
-      std::vector<TitratableResidue> getResidues() { return residues_; }
+      std::vector<TitratableResidue> getResidues() const { return residues_; }
 
       // Provide an iterator over the data
       typedef std::vector<TitratableResidue>::const_iterator ResIterator;

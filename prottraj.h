@@ -4,6 +4,7 @@
 
 #include "cpin.h"
 #include "cpout.h"
+#include "types.h"
 
 class ProtTraj {
 
@@ -42,9 +43,6 @@ class ProtTraj {
       void PrintProtPop(std::string const&);
 
    private:
-      // New type: protonation state vector
-      typedef std::vector<int> ProtVector;
-      typedef ProtVector::const_iterator ProtVectorIterator;
 
       // Cpin file
       Cpin *cpin_;

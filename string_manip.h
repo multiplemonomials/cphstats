@@ -14,4 +14,7 @@ std::vector<std::string> split(char*);
 std::string strip(std::string const&);
 std::string strip(char*);
 
+std::string upper(std::string const&);
+std::string upper(const char*);
+
 #endif

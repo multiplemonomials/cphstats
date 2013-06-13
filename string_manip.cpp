@@ -53,3 +53,15 @@ string strip(string const& instring) {
 string strip(const char* instring) {
    return strip(string(instring));
 }
+
+string upper(string const& instring) {
+   string ret;
+   for (size_t i = 0; i < instring.size(); i++)
+      ret += (char) toupper(instring[i]);
+
+   return ret;
+}
+
+string upper(const char* instring) {
+   return upper(string(instring));
+}

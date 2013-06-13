@@ -1,3 +1,5 @@
+// main.cpp: Holds the main program
+
 #include <cstdio>
 #include "cpin.h"
 #include "cpout.h"

@@ -1,11 +1,14 @@
 cloptions.cpp: cloptions.h utilities.h
+cloptions.h: conprob.h
+conprob.cpp: conprob.h string_manip.h
+conprob.h: cpin.h types.h
 cpin.cpp: cpin.h string_manip.h
 cpin.h: constants.h
 cpout.cpp: cpout.h string_manip.h
 cpout.h: constants.h
 main.cpp: cpin.h cpout.h cloptions.h prottraj.h test.h types.h utilities.h
 prottraj.cpp: prottraj.h constants.h
-prottraj.h: cpin.h cpout.h
+prottraj.h: cpin.h cpout.h types.h
 string_manip.cpp: constants.h string_manip.h
 test.cpp: constants.h test.h
 test.h: cloptions.h cpout.h
