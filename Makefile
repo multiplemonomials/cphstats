@@ -8,7 +8,7 @@ OBJS = main.o cpin.o parse_cpin.o string_manip.o cloptions.o test.o cpout.o \
 all: $(PROGNAME)
 
 $(PROGNAME): $(OBJS)
-	$(LD) $(LDFLAGS) -o $(PROGNAME) $(OBJS)
+	$(LD) -o $(PROGNAME) $(OBJS) $(LDFLAGS)
 
 install: $(PROGNAME)
 	/bin/mv $(PROGNAME) $(PREFIX)/bin
