@@ -10,21 +10,19 @@
 ConditionalProb::ConditionalProb() :
 valid_(UNASSIGNED) {}
 
-ConditionalProb::ConditionalProb(std::string const& instring, Cpin const& cpin) {
-   valid_ = Set(instring, cpin);
+ConditionalProb::ConditionalProb(std::string const& instring) {
+   valid_ = UNASSIGNED;
+   instring_ = instring;
 }
 
-ConditionalProb::ConditionalProb(const char* instring, Cpin const& cpin) {
-   valid_ = Set(instring, cpin);
+ConditionalProb::ConditionalProb(const char* instring) {
+   valid_ = UNASSIGNED;
+   instring_ = std::string(instring);
 }
 
-ConditionalProb::RetType ConditionalProb::Set(const char* instring, Cpin const& cpin) {
-   return Set(std::string(instring), cpin);
-}
+ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
 
-ConditionalProb::RetType ConditionalProb::Set(std::string const& instring, Cpin const& cpin) {
-
-   if (instring.empty()) {
+   if (instring_.empty()) {
       fprintf(stderr, "Error: Conditional probability string is empty!\n");
       return ERR;
    }
@@ -38,20 +36,20 @@ ConditionalProb::RetType ConditionalProb::Set(std::string const& instring, Cpin 
    std::string PROT = std::string("PROTONATED");
 
    // We have to parse something like; <number>:<state>,<number>:<state>,...
-   std::vector<std::string> criteria = split(instring, ",");
+   std::vector<std::string> criteria = split(instring_.c_str(), ",");
 
    for (std::vector<std::string>::const_iterator cit = criteria.begin();
         cit != criteria.end(); cit++) {
       std::vector<std::string> parts = split(*cit, ":");
       if (parts.size() != 2) {
          fprintf(stderr, "Error: Conditional probability string [%s] not recognized!\n",
-                 instring.c_str());
+                 instring_.c_str());
          return ERR;
       }
       int resid = atoi(parts[0].c_str());
       if (resid == 0) {
          fprintf(stderr, "Error: Could not determine residue name from [%s] in [%s]\n",
-                 cit->c_str(), instring.c_str());
+                 cit->c_str(), instring_.c_str());
          return ERR;
       }
       // Find out which residue index this is
@@ -77,18 +75,27 @@ ConditionalProb::RetType ConditionalProb::Set(std::string const& instring, Cpin 
             return ERR;
          }
          active_states_[residx][stateidx] = true;
+//       printf("Residue %d, state %d is true.\n", residx, stateidx); // DEBUG
      }else {
          parts[1] = upper(parts[1]);
          if (PROT.size() >= parts[1].size() && 
              parts[1] == PROT.substr(0, parts[1].size())) {
             // Label all protonated states of this residue
-            for (int i = 0; i < cpin.getResidues()[residx].numStates(); i++)
+            for (int i = 0; i < cpin.getResidues()[residx].numStates(); i++) {
                active_states_[residx][i] = cpin.getResidues()[residx].isProtonated(i);
+//             // DEBUG
+//             if (cpin.getResidues()[residx].isProtonated(i))
+//                printf("Residue %d, state %d is true.\n", residx, i);
+            }
 
         }else if (DEPROT.size() >= parts[1].size() &&
                   parts[1] == DEPROT.substr(0, parts[1].size())) {
-            for (int i = 0; i < cpin.getResidues()[residx].numStates(); i++)
+            for (int i = 0; i < cpin.getResidues()[residx].numStates(); i++) {
                active_states_[residx][i] = !cpin.getResidues()[residx].isProtonated(i);
+//             // DEBUG
+//             if (!cpin.getResidues()[residx].isProtonated(i))
+//                printf("Residue %d, state %d is true.\n", residx, i);
+            }
 
         }else {
             fprintf(stderr, "Error: Could not identify conditional criteria [%s]\n",
@@ -116,10 +123,13 @@ ConditionalProb::RetType ConditionalProb::Set(std::string const& instring, Cpin 
             active_states_[i][j] = true;
    }
 
+// // DEBUG
+// for (int i = 0; i < 80; i++) printf("="); printf("\n");
+
    return OK;
 }
 
-bool ConditionalProb::SatisfiedBy(ProtVector invec) {
+bool ConditionalProb::SatisfiedBy(ProtVector invec) const {
    bool satisfied = true;
    for (size_t i = 0; i < invec.size(); i++)
       satisfied = satisfied && active_states_[i][invec[i]];

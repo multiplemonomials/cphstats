@@ -1,7 +1,7 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "0.7"
+#define VERSION_STR "0.8"
 
 #include <cstring>
 #include <string>
@@ -31,33 +31,35 @@ class CLOptions {
       int CheckInput();
 
       /// These functions are getters for the various options
-      std::vector<std::string> Cpouts() const { return cpouts_;         }
-      int Verbose() const                     { return verbose_;        }
-      std::string Cpin() const                { return cpin_;           }
-      std::string Output() const              { return output_;         }
-      bool Calcpka() const                    { return do_calcpka_;     }
-      std::string CumulativeOutput() const    { return cumout_;         }
-      bool doCumulative() const               { return cumulative_;     }
-      std::string RunningAvgOutput() const    { return runavgout_;      }
-      std::string Prog() const                { return prog_;           }
-      std::string ChunkOutput() const         { return chunkout_;       }
-      bool Overwrite() const                  { return overwrite_;      }
-      int RunningAvgWindow() const            { return runavgwin_;      }
-      int ChunkWindow() const                 { return chunksize_;      }
-      int Interval() const                    { return interval_;       }
-      bool PrintProtonated() const            { return protonated_;     }
-      bool PrintDeprotonated() const          { return !protonated_;    }
-      std::string REMDPrefix() const          { return reorder_prefix_; }
-      float TimeStep() const                  { return time_step_;      }
-      bool pKa() const                        { return pKa_;            }
-      std::string Protonation() const         { return protonation_;    }
+      std::vector<std::string> Cpouts() const  { return cpouts_;         }
+      int Verbose() const                      { return verbose_;        }
+      std::string Cpin() const                 { return cpin_;           }
+      std::string Output() const               { return output_;         }
+      bool Calcpka() const                     { return do_calcpka_;     }
+      std::string CumulativeOutput() const     { return cumout_;         }
+      bool doCumulative() const                { return cumulative_;     }
+      std::string RunningAvgOutput() const     { return runavgout_;      }
+      std::string Prog() const                 { return prog_;           }
+      std::string ChunkOutput() const          { return chunkout_;       }
+      bool Overwrite() const                   { return overwrite_;      }
+      int RunningAvgWindow() const             { return runavgwin_;      }
+      int ChunkWindow() const                  { return chunksize_;      }
+      int Interval() const                     { return interval_;       }
+      bool PrintProtonated() const             { return protonated_;     }
+      bool PrintDeprotonated() const           { return !protonated_;    }
+      std::string REMDPrefix() const           { return reorder_prefix_; }
+      float TimeStep() const                   { return time_step_;      }
+      bool pKa() const                         { return pKa_;            }
+      std::string Population() const           { return population_;     }
+      std::vector<ConditionalProb> CondProbs() { return condprobs_;      }
+      std::string ConditionalOutput() const    { return condprobf_;      }
 
       // Provide an iterator over the cpouts
       typedef std::vector<std::string>::const_iterator cpout_iterator;
       cpout_iterator begin()     { return cpouts_.begin(); }
       cpout_iterator end()       { return cpouts_.end();   }
 
-      typedef std::vector<ConditionalProb>::const_iterator prob_iterator;
+      typedef std::vector<ConditionalProb>::iterator prob_iterator;
       prob_iterator condbegin()  { return condprobs_.begin(); }
       prob_iterator condend()    { return condprobs_.end();   }
 
@@ -101,9 +103,11 @@ class CLOptions {
       /// Do we put predicted pKas for time series?
       bool pKa_;
       /// Protonated fraction output file
-      std::string protonation_;
+      std::string population_;
       /// List of conditional probabilities
       std::vector<ConditionalProb> condprobs_;
+      /// File name of the conditional probability output
+      std::string condprobf_;
 
 };
 

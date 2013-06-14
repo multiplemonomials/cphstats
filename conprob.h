@@ -13,18 +13,19 @@ class ConditionalProb {
       enum RetType {OK=0, ERR, UNASSIGNED};
       // Constructors
       ConditionalProb();
-      ConditionalProb(std::string const&, Cpin const&);
-      ConditionalProb(const char*, Cpin const&);
+      ConditionalProb(std::string const&);
+      ConditionalProb(const char*);
+      ConditionalProb(Cpin const&);
    
-      static int DEBUG;
-
       // Sets up the conditional probability
-      RetType Set(std::string const&, Cpin const&);
-      RetType Set(const char*, Cpin const&);
+      RetType Set(Cpin const&);
 
       // Determines if this conditional probability is satisfied by a
       // protonation state vector
-      bool SatisfiedBy(ProtVector);
+      bool SatisfiedBy(ProtVector) const;
+
+      // Returns the original string
+      std::string str() const { return instring_; }
 
    private:
 
@@ -32,6 +33,8 @@ class ConditionalProb {
       typedef std::vector<bool> ActiveState;
 
       std::vector<ActiveState> active_states_;
+
+      std::string instring_;
 
       RetType valid_;
 };

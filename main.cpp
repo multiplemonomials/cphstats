@@ -124,9 +124,20 @@ int main(int argc, char**argv) {
                         clopt.PrintProtonated() && !clopt.pKa(), clopt.pKa());
 
    // Do protonation fraction dump
-   if (clopt.Protonation().size() > 0)
-      stats.PrintProtPop(clopt.Protonation());
+   if (clopt.Population().size() > 0)
+      stats.PrintProtPop(clopt.Population());
 
+   // Do conditional probabilities
+   if (clopt.CondProbs().size() > 0) {
+      for (CLOptions::prob_iterator it = clopt.condbegin(); 
+                                    it != clopt.condend(); it++)
+         if (it->Set(my_cpin) == ConditionalProb::ERR) {
+            fprintf(stderr, "Quitting due to errors above.\n");
+            return 1;
+         }
+
+      stats.PrintCondProb(clopt.ConditionalOutput(), clopt.CondProbs());
+   }
    printf("All done!\n");
 
    return 0;

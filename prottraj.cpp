@@ -323,3 +323,36 @@ void ProtTraj::PrintProtPop(std::string const& fname) {
 
    fclose(fp);
 }
+
+/// Prints out the conditional probabilities
+void ProtTraj::PrintCondProb(std::string const& fname,
+                             std::vector<ConditionalProb> const& condprobs) {
+   // Determine how large the field has to be to print out all of the
+   // conditional probabilities
+   size_t max_size = condprobs[0].str().size() + (size_t) 1;
+   for (std::vector<ConditionalProb>::const_iterator it = condprobs.begin();
+        it != condprobs.end(); it++) {
+      max_size = MAX(max_size, it->str().size() + (size_t) 1);
+   }
+   max_size = MAX(max_size, 25);
+
+   char fmt[10];
+   sprintf(fmt, "%%%ds", (int) max_size);
+   // Open the file, then loop through all conditional probabilities, calculate
+   // the conditional probability, then print it
+   FILE *fp = fopen(fname.c_str(), "w");
+   fprintf(fp, fmt, "Conditional Probabilities");
+   fprintf(fp, " %10s\n", "Fraction");
+   for (std::vector<ConditionalProb>::const_iterator it = condprobs.begin();
+        it != condprobs.end(); it++) {
+      // Now loop through the whole trajectory
+      long long int counted = 0;
+      for (int i = 0; i < nframes_; i++)
+         counted += (long long int) it->SatisfiedBy(statelist_[i]);
+
+      fprintf(fp, fmt, it->str().c_str());
+      double frac = (double) counted / (double) nframes_;
+      fprintf(fp, " %10.6f\n", frac);
+   }
+   fclose(fp);
+}

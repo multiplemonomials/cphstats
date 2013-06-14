@@ -2,6 +2,7 @@
 #define PROTTRAJ_H
 #include <vector>
 
+#include "conprob.h"
 #include "cpin.h"
 #include "cpout.h"
 #include "types.h"
@@ -41,6 +42,9 @@ class ProtTraj {
 
       // Prints a summary of the population of each residue in each state
       void PrintProtPop(std::string const&);
+
+      // Prints the conditional probability over the course of a trajectory
+      void PrintCondProb(std::string const&, std::vector<ConditionalProb> const&);
 
    private:
 
