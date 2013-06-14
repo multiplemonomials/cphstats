@@ -245,7 +245,6 @@ void CLOptions::Help() {
    printf("\n");
    printf("Input Files and Options:\n");
    printf("    -i FILE, --cpin FILE\n");
-   printf("\n");
    printf("                   Input cpin file (from sander) with titrating residue\n");
    printf("                   information.\n");
    printf("    -t FLOAT, --time-step FLOAT\n");
