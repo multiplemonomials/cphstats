@@ -23,16 +23,16 @@ pKa_(false)
 {
    
    // Initialize some strings
-   runavgout_ = std::string("running_avgs.dat");
-   cumout_ = std::string("cumulative.dat");
-   chunkout_ = std::string("chunk.dat");
-   condprobf_ = std::string("conditional_prob.dat");
+   runavgout_ = string("running_avgs.dat");
+   cumout_ = string("cumulative.dat");
+   chunkout_ = string("chunk.dat");
+   condprobf_ = string("conditional_prob.dat");
 
    // Now parse everything
    int i = 1;
-   std::vector<bool> marked(argc, false);
+   vector<bool> marked(argc, false);
 
-   prog_ = std::string(argv[0]);
+   prog_ = string(argv[0]);
    prog_ = prog_.substr(prog_.find_last_of('/')+1);
    parse_return_ = OK;
    marked[0] = true; // this is the program name
@@ -60,23 +60,23 @@ pKa_(false)
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         cpin_ = std::string(argv[i]);
+         cpin_ = string(argv[i]);
      }else if (strncmp("--cpin", argv[i], 6) == 0 && strlen(argv[i]) == 6) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         cpin_ = std::string(argv[i]);
+         cpin_ = string(argv[i]);
      }else if (strncmp("--calcpka-output", argv[i], 16) == 0 && 
                strlen(argv[i]) == 16) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         output_ = std::string(argv[i]);
+         output_ = string(argv[i]);
      }else if (strncmp("-o", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         output_ = std::string(argv[i]);
+         output_ = string(argv[i]);
      }else if (strncmp("-v", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
@@ -91,24 +91,24 @@ pKa_(false)
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         runavgout_ = std::string(argv[i]);
+         runavgout_ = string(argv[i]);
      }else if (strncmp("--running-avg-out", argv[i], 17) == 0 && 
                strlen(argv[i]) == 17) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         runavgout_ = std::string(argv[i]);
+         runavgout_ = string(argv[i]);
      }else if (strncmp("--chunk-out", argv[i], 11) == 0 && strlen(argv[i]) == 11) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         chunkout_ = std::string(argv[i]);
+         chunkout_ = string(argv[i]);
      }else if (strncmp("--cumulative-out", argv[i], 16) == 0 && 
                strlen(argv[i]) == 16) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         cumout_ = std::string(argv[i]);
+         cumout_ = string(argv[i]);
      }else if (strncmp("--calcpka", argv[i], 9) == 0 && strlen(argv[i]) == 9) {
          marked[i] = true;
          do_calcpka_ = true;
@@ -162,7 +162,7 @@ pKa_(false)
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         reorder_prefix_ = std::string(argv[i]);
+         reorder_prefix_ = string(argv[i]);
      }else if (strncmp("-n", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
@@ -195,7 +195,7 @@ pKa_(false)
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         population_ = std::string(argv[i]);
+         population_ = string(argv[i]);
      }else if (strncmp("-c", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
@@ -211,7 +211,7 @@ pKa_(false)
          marked[i++] = true;
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         condprobf_ = std::string(argv[i]);
+         condprobf_ = string(argv[i]);
      }else if (strncmp("-", argv[i], 1) == 0) {
          fprintf(stderr, "Unrecognized command-line option: %s\n", argv[i]);
          parse_return_ = ERR;
@@ -225,7 +225,7 @@ pKa_(false)
       for (int j = 1; j < argc; j++) {
          if (!marked[j]) {
             marked[j] = true;
-            cpouts_.push_back(std::string(argv[j]));
+            cpouts_.push_back(string(argv[j]));
          }
       }
    }
@@ -318,8 +318,8 @@ void CLOptions::Help() {
    printf("                   string of the format:\n");
    printf("                         <resid>:<state>,<resid>:<state>,...\n");
    printf("                   Where <resid> is the residue number in the prmtop (NOT the\n");
-   printf("                   cpin) and <state> is either the state number or (d)eprotonated\n");
-   printf("                   or (p)rotonated, case-insensitive\n");
+   printf("                   cpin) and <state> is either the state number or (p)rotonated\n");
+   printf("                   or (d)eprotonated, case-insensitive\n");
    printf("\n");
    printf("This program analyzes constant pH output files (cpout) from Amber.\n");
    printf("These output files can be compressed using gzip compression. The\n");
