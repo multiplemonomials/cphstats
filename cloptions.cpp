@@ -16,7 +16,7 @@ cumulative_(false),
 runavgwin_(0),
 chunksize_(0),
 overwrite_(false),
-interval_(1),
+interval_(1000),
 protonated_(true),
 time_step_(0.002f),
 pKa_(false),
@@ -213,6 +213,12 @@ debug_(false)
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          condprobf_ = string(argv[i]);
+     }else if (strncmp("--chunk-conditional", argv[i], 19) == 0 &&
+               strlen(argv[i]) == 19) {
+         marked[i++] = true;
+         if (i == argc) {parse_return_ = INSUFARGS; break;}
+         marked[i] = true;
+         condprob_chunk_ = string(argv[i]);
      }else if (strncmp("--debug", argv[i], 7) == 0 && strlen(argv[i]) == 7) {
          marked[i] = true;
          debug_ = true;
@@ -277,6 +283,10 @@ void CLOptions::Help() {
    printf("                   printed for every state of every residue.\n");
    printf("    --conditional-output FILE\n");
    printf("                   Output file with requested conditional probabilities.\n");
+   printf("                   Default is [conditional_prob.dat].\n");
+   printf("    --chunk-conditional FILE\n");
+   printf("                   Prints a time series of the conditional probabilities over\n");
+   printf("                   a trajectory split up into chunks.\n");
    printf("\n");
    printf("Output Options:\n");
    printf("  These options modify how the output files will appear\n");
@@ -289,6 +299,9 @@ void CLOptions::Help() {
    printf("    -n INT, --interval INT\n");
    printf("                   An interval between which to print out time series data\n");
    printf("                   like `chunks', `cumulative' data, and running averages.\n");
+   printf("                   It is also used as the 'window' of the conditional\n");
+   printf("                   probability time series (--chunk-conditional).\n");
+   printf("                   Default [1000]\n");
    printf("    -p, --protonated\n");
    printf("                   Print out protonation fraction instead of deprotonation\n");
    printf("                   fraction in time series data (Default behavior).\n");
@@ -340,6 +353,7 @@ void CLOptions::Usage() {
    printf("             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]\n");
    printf("             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]\n");
    printf("             [--population FILE] [-c CONDITION -c CONDITION -c ...]\n");
+   printf("             [--conditional-output FILE] [--chunk-conditional FILE]\n");
    printf("             cpout1 [cpout2 [cpout3 ...] ]\n");
 
    return;
@@ -392,6 +406,12 @@ int CLOptions::CheckInput() {
    if (runavgwin_ > 0 && !overwrite_)
       if (fexists(runavgout_)) {
          fprintf(stderr, "Error: %s exists; not overwriting.\n", runavgout_.c_str());
+         inerr = 1;
+      }
+
+   if (!condprob_chunk_.empty() && !overwrite_)
+      if (fexists(condprob_chunk_)) {
+         fprintf(stderr, "Error: %s exists; not overwriting.\n", condprob_chunk_.c_str());
          inerr = 1;
       }
 

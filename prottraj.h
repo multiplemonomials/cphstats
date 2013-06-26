@@ -46,6 +46,10 @@ class ProtTraj {
       // Prints the conditional probability over the course of a trajectory
       void PrintCondProb(std::string const&, std::vector<ConditionalProb> const&);
 
+      // Prints the time series of conditional probabilities
+      void PrintCondTimeseries(std::string const&, const int,
+                               std::vector<ConditionalProb> const&);
+
    private:
 
       // Cpin file
@@ -74,6 +78,6 @@ class ProtTraj {
          std::vector<int> prot_cnt;
          int nstates;
       } StateCount;
-      
+
 };
 #endif /* PROTTRAJ_H */

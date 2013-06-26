@@ -140,6 +140,13 @@ int main(int argc, char**argv) {
 
       stats.PrintCondProb(clopt.ConditionalOutput(), clopt.CondProbs());
    }
+
+   // Do conditional probability time series (we already set the conditional
+   // probabilities above, so no need to do it again)
+   if (clopt.CondProbs().size() > 0 && !clopt.ConditionalChunkOut().empty())
+      stats.PrintCondTimeseries(clopt.ConditionalChunkOut(), clopt.Interval(),
+                                clopt.CondProbs());
+
    if (clopt.Debug()) printf("All done!\n");
 
    return 0;

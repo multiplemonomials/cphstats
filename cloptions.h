@@ -1,7 +1,7 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "0.9"
+#define VERSION_STR "1.0"
 
 #include <cstring>
 #include <string>
@@ -53,6 +53,7 @@ class CLOptions {
       std::string Population() const           { return population_;     }
       std::vector<ConditionalProb> CondProbs() { return condprobs_;      }
       std::string ConditionalOutput() const    { return condprobf_;      }
+      std::string ConditionalChunkOut() const  { return condprob_chunk_; }
       bool Debug() const                       { return debug_;          }
 
       // Provide an iterator over the cpouts
@@ -111,6 +112,8 @@ class CLOptions {
       std::string condprobf_;
       /// Do we print out debugging info?
       bool debug_;
+      /// Output file for chunk conditional time series
+      std::string condprob_chunk_;
 
 };
 

@@ -356,3 +356,48 @@ void ProtTraj::PrintCondProb(std::string const& fname,
    }
    fclose(fp);
 }
+
+void ProtTraj::PrintCondTimeseries(std::string const& fname, const int window,
+                                   std::vector<ConditionalProb> const& condprobs) {
+   // Determine how large the field has to be to print out all of the
+   // conditional probabilities
+   size_t max_size = 10;
+   for (std::vector<ConditionalProb>::const_iterator it = condprobs.begin();
+        it != condprobs.end(); it++) {
+      max_size = MAX(max_size, it->str().size() + (size_t) 1);
+   }
+
+   char fmt[10];
+   char nfmt[10];
+   sprintf(fmt, " %%%ds", (int) max_size);
+   sprintf(nfmt, " %%%d.5f", (int) max_size);
+
+   // Open the file, then loop through all conditional probabilities, calculate
+   // the conditional probability, then print it
+   FILE *fp = fopen(fname.c_str(), "w");
+   fprintf(fp, " Time step");
+   for (std::vector<ConditionalProb>::const_iterator it = condprobs.begin();
+        it != condprobs.end(); it++)
+      fprintf(fp, fmt, it->str().c_str());
+
+   fprintf(fp, "\n");
+
+   int interval = window / time_step_;
+   int first = 0;
+   while (first + interval <= nframes_) {
+      std::vector<long long int> nprot(nres_, 0ll);
+      fprintf(fp, "%10d", first*time_step_);
+      for (std::vector<ConditionalProb>::const_iterator it = condprobs.begin();
+           it != condprobs.end(); it++) {
+         long long int counted = 0ll;
+         for (int i = first; i < first + interval; i++)
+            counted += (long long int) it->SatisfiedBy(statelist_[i]);
+         double frac = (double) counted / (double) interval;
+         fprintf(fp, nfmt, frac);
+      }
+      fprintf(fp, "\n");
+      first += interval;
+   }
+
+   fclose(fp);
+}

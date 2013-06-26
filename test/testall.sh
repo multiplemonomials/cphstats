@@ -139,9 +139,11 @@ compare pop.dat.save pop.dat
 # Check the conditional probability output
 $EXE -O -i 1AKI.dry.equil.cpin md?_cpout.pH_4.00 \
      --no-calcpka -c 35:prot,52:0 -c 66:D,48:P \
-     --conditional-output conditional.dat
+     --conditional-output conditional.dat \
+     --chunk-conditional conditional_chunks.dat
 
 compare conditional.dat.save conditional.dat
+compare conditional_chunks.dat.save conditional_chunks.dat
 
 echo ""
 if [ $NFAIL -ne 0 ]; then
