@@ -12,7 +12,7 @@ parser.add_option('-n', '--no-opt', dest='opt', default=True,
                   action='store_false', help='Disable compiler optimizations.')
 parser.add_option('-p', '--program', dest='prog', default='cphstats',
                   help='The name of the resulting program. Default %default.')
-parser.add_option('--prefix', dest='prefix', default='.',
+parser.add_option('--prefix', dest='prefix', default='/usr/local',
                   help='Installation destination. Default is current directory')
 
 
