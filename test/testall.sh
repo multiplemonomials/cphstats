@@ -6,17 +6,17 @@ EXE=../cphstats
 
 NFAIL=0
 
-if [ ! -x $EXE ]; then
-   echo "Could not find cphstats in the previous directory."
-   echo "Re-install, then test again."
-   exit 1
-fi
-
 if [ ! -z "$1" -a "$1" = "clean" ]; then
    /bin/rm -f md?_cpout.pH_?.??
    /bin/rm -f *.dat
    /bin/rm -f *.calcpka
    exit 0
+fi
+
+if [ ! -x $EXE ]; then
+   echo "Could not find cphstats in the previous directory."
+   echo "Re-install, then test again."
+   exit 1
 fi
 
 compare() {
