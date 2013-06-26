@@ -210,7 +210,7 @@ void ProtTraj::PrintCumulative(std::string const& fname, const int interval,
 void ProtTraj::PrintRunningAvg(const int window, const int interval,
                                std::string const& fname, const bool print_prot,
                                const bool print_pka) {
-   int halfwin = window / 2;
+   const int halfwin = window / (2 * time_step_);
 
    // Open the file for writing and print a header
    FILE *fp = fopen(fname.c_str(), "w");
