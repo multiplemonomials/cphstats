@@ -1,7 +1,7 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "0.8.1"
+#define VERSION_STR "0.9"
 
 #include <cstring>
 #include <string>
@@ -53,6 +53,7 @@ class CLOptions {
       std::string Population() const           { return population_;     }
       std::vector<ConditionalProb> CondProbs() { return condprobs_;      }
       std::string ConditionalOutput() const    { return condprobf_;      }
+      bool Debug() const                       { return debug_;          }
 
       // Provide an iterator over the cpouts
       typedef std::vector<std::string>::const_iterator cpout_iterator;
@@ -108,6 +109,8 @@ class CLOptions {
       std::vector<ConditionalProb> condprobs_;
       /// File name of the conditional probability output
       std::string condprobf_;
+      /// Do we print out debugging info?
+      bool debug_;
 
 };
 

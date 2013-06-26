@@ -47,20 +47,22 @@ int main(int argc, char**argv) {
                  clopt.Cpin().c_str());
          return 1;
       }
-      printf("There are %d titratable residues defined in %s:\n",
-             nres, my_cpin.getFilename().c_str());
-      printf("They are:\n");
-      for (Cpin::ResIterator it = my_cpin.begin(); it != my_cpin.end(); it++) {
-         printf("\t%3s %-3d (%d states) [ ", it->getResname().c_str(),
-                                          it->getResnum(), it->numStates());
-         for (int j = 0; j < it->numStates(); j++) {
-            if (it->isProtonated(j))
-               printf("P ");
-            else
-               printf("D ");
+      if (clopt.Debug()) {
+         printf("There are %d titratable residues defined in %s:\n",
+                nres, my_cpin.getFilename().c_str());
+         printf("They are:\n");
+         for (Cpin::ResIterator it = my_cpin.begin(); it != my_cpin.end(); it++) {
+            printf("\t%3s %-3d (%d states) [ ", it->getResname().c_str(),
+                                             it->getResnum(), it->numStates());
+            for (int j = 0; j < it->numStates(); j++) {
+               if (it->isProtonated(j))
+                  printf("P ");
+               else
+                  printf("D ");
+            }
+            printf("]\n");
          }
-         printf("]\n");
-         }
+      }
    } // if clopt.REMDPrefix().empty()
 
    // Set up the cpouts
@@ -81,11 +83,11 @@ int main(int argc, char**argv) {
                  it->c_str(), c.Nres(), my_cpin.getTrescnt());
          continue;
       }
-      fprintf(stdout, "Added [[ %s ]] to cpout list.\n", it->c_str());
+      if (clopt.Debug()) printf("Added [[ %s ]] to cpout list.\n", it->c_str());
       cpouts.push_back(c);
    }
 
-   printf("Analyzing %d cpouts.\n", (int)clopt.Cpouts().size());
+   if (clopt.Debug()) printf("Analyzing %d cpouts.\n", (int)clopt.Cpouts().size());
 
    // Special-case REMD re-ordering
    if (!clopt.REMDPrefix().empty())
@@ -138,7 +140,7 @@ int main(int argc, char**argv) {
 
       stats.PrintCondProb(clopt.ConditionalOutput(), clopt.CondProbs());
    }
-   printf("All done!\n");
+   if (clopt.Debug()) printf("All done!\n");
 
    return 0;
 }

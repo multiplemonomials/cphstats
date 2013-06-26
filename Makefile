@@ -29,6 +29,10 @@ depends::
 
 clean:
 	/bin/rm -f $(OBJS)
+	cd test && ./testall.sh clean
+
+test: $(PROGNAME)
+	cd test && ./testall.sh
 
 new: clean $(PROGNAME)
 

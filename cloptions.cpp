@@ -19,7 +19,8 @@ overwrite_(false),
 interval_(1),
 protonated_(true),
 time_step_(0.002f),
-pKa_(false)
+pKa_(false),
+debug_(false)
 {
    
    // Initialize some strings
@@ -212,6 +213,9 @@ pKa_(false)
          if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
          condprobf_ = string(argv[i]);
+     }else if (strncmp("--debug", argv[i], 7) == 0 && strlen(argv[i]) == 7) {
+         marked[i] = true;
+         debug_ = true;
      }else if (strncmp("-", argv[i], 1) == 0) {
          fprintf(stderr, "Unrecognized command-line option: %s\n", argv[i]);
          parse_return_ = ERR;
@@ -242,6 +246,8 @@ void CLOptions::Help() {
    printf("    -V, --version  Print the version number and exit.\n");
    printf("    -O, --overwrite\n");
    printf("                   Allow existing outputs to be overwritten.\n");
+   printf("    --debug        Print out information about the files that are\n");
+   printf("                   being read in and used for the calculations.\n");
    printf("\n");
    printf("Input Files and Options:\n");
    printf("    -i FILE, --cpin FILE\n");
