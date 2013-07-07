@@ -1,29 +1,31 @@
 // conprob.cpp: contains the code to handle conditional probability evaluations
+#include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <cctype>
-#include <cstdio>
-#include <cstdlib>
 
 #include "conprob.h"
 #include "string_manip.h"
 
+using namespace std;
+
 ConditionalProb::ConditionalProb() :
 valid_(UNASSIGNED) {}
 
-ConditionalProb::ConditionalProb(std::string const& instring) {
+ConditionalProb::ConditionalProb(string const& instring) {
    valid_ = UNASSIGNED;
    instring_ = instring;
 }
 
 ConditionalProb::ConditionalProb(const char* instring) {
    valid_ = UNASSIGNED;
-   instring_ = std::string(instring);
+   instring_ = string(instring);
 }
 
 ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
 
    if (instring_.empty()) {
-      fprintf(stderr, "Error: Conditional probability string is empty!\n");
+      cerr << "Error: Conditional probability string is empty!" << endl;
       return ERR;
    }
 
@@ -32,24 +34,24 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
       active_states_.push_back( ActiveState(rit->numStates(), false) );
 
    // For comparisons
-   std::string DEPROT = std::string("DEPROTONATED");
-   std::string PROT = std::string("PROTONATED");
+   string DEPROT = string("DEPROTONATED");
+   string PROT = string("PROTONATED");
 
    // We have to parse something like; <number>:<state>,<number>:<state>,...
-   std::vector<std::string> criteria = split(instring_.c_str(), ",");
+   vector<string> criteria = split(instring_.c_str(), ",");
 
-   for (std::vector<std::string>::const_iterator cit = criteria.begin();
+   for (vector<string>::const_iterator cit = criteria.begin();
         cit != criteria.end(); cit++) {
-      std::vector<std::string> parts = split(*cit, ":");
+      vector<string> parts = split(*cit, ":");
       if (parts.size() != 2) {
-         fprintf(stderr, "Error: Conditional probability string [%s] not recognized!\n",
-                 instring_.c_str());
+         cerr << "Error: Conditional probability string [" << instring_ <<
+                 "] not recognized!" << endl;
          return ERR;
       }
-      int resid = atoi(parts[0].c_str());
+      int resid = StringToInt(parts[0]);
       if (resid == 0) {
-         fprintf(stderr, "Error: Could not determine residue name from [%s] in [%s]\n",
-                 cit->c_str(), instring_.c_str());
+         cerr << "Error: Could not determine residue name from [" << *cit << "] in ["
+              << instring_ << "]" << endl;
          return ERR;
       }
       // Find out which residue index this is
@@ -61,21 +63,20 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
          }
       }
       if (residx < 0) {
-         fprintf(stderr, "Error: Residue %d does not appear to be titratable!\n", 
-                 resid);
+         cerr << "Error: Residue " << resid << " does not appear to be titratable!" << endl;
          return ERR;
       }
       
       int stateidx;
-      std::istringstream iss(parts[1]);
+      istringstream iss(parts[1]);
       if (iss >> stateidx) {
          if (stateidx >= cpin.getResidues()[residx].numStates()) {
-            fprintf(stderr, "Error: State index %d out of range for residue %d!\n",
-                    stateidx, resid);
+            cerr << "Error: State index " << stateidx << " out of range for residue "
+                 << resid << "!" << endl;
             return ERR;
          }
          active_states_[residx][stateidx] = true;
-//       printf("Residue %d, state %d is true.\n", residx, stateidx); // DEBUG
+//       cout << "Residue " << residx << ", state " << stateidx << " is true." << endl; // DEBUG
      }else {
          parts[1] = upper(parts[1]);
          if (PROT.size() >= parts[1].size() && 
@@ -85,7 +86,7 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
                active_states_[residx][i] = cpin.getResidues()[residx].isProtonated(i);
 //             // DEBUG
 //             if (cpin.getResidues()[residx].isProtonated(i))
-//                printf("Residue %d, state %d is true.\n", residx, i);
+//                cout << "Residue " << residx << ", state " << i << " is true." << endl;
             }
 
         }else if (DEPROT.size() >= parts[1].size() &&
@@ -94,12 +95,12 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
                active_states_[residx][i] = !cpin.getResidues()[residx].isProtonated(i);
 //             // DEBUG
 //             if (!cpin.getResidues()[residx].isProtonated(i))
-//                printf("Residue %d, state %d is true.\n", residx, i);
+//                cout << "Residue " << residx << ", state " << i << " is true." << endl;
             }
 
         }else {
-            fprintf(stderr, "Error: Could not identify conditional criteria [%s]\n",
-                    parts[1].c_str());
+            cerr << "Error: Could not identify conditional criteria [" <<
+                    parts[1] << "]" << endl;
             return ERR;
          }
       }
@@ -123,8 +124,8 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
             active_states_[i][j] = true;
    }
 
-// // DEBUG
-// for (int i = 0; i < 80; i++) printf("="); printf("\n");
+// DEBUG
+// cout << setfill('=') << setw(80) << "=" << endl; setfill(' ');
 
    return OK;
 }
