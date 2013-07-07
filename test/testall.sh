@@ -10,6 +10,7 @@ if [ ! -z "$1" -a "$1" = "clean" ]; then
    /bin/rm -f md?_cpout.pH_?.??
    /bin/rm -f *.dat
    /bin/rm -f *.calcpka
+   /bin/rm -f *.txt
    exit 0
 fi
 
@@ -88,9 +89,11 @@ compare pH_7.50.calcpka.save pH_7.50.calcpka
 for cpout in md?_cpout.pH_2.00; do
    gzip -9 $cpout
 done
-$EXE -O -i 1AKI.dry.equil.cpin md?_cpout.pH_2.00.gz -o pH_2.00.calcpka
+$EXE -O -i 1AKI.dry.equil.cpin md?_cpout.pH_2.00.gz -o pH_2.00.calcpka \
+     --debug > cphstats_output.txt
 
 compare pH_2.00.calcpka.save pH_2.00.calcpka
+compare cphstats_output.txt.save cphstats_output.txt
 
 # Check running averages
 $EXE -O -i 1AKI.dry.equil.cpin md?_cpout.pH_4.00 \
