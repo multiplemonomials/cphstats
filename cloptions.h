@@ -3,11 +3,12 @@
 
 #define VERSION_STR "1.0"
 
-#include <cstring>
+#include <sstream>
 #include <string>
 #include <vector>
 
 #include "conprob.h"
+#include "exceptions.h"
 
 class CLOptions {
    public:

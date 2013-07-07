@@ -1,7 +1,9 @@
 // string_manip.cpp: Contains the routines to do string manipulations
 
+#include <sstream>
 #include <cstring>
 #include "constants.h"
+#include "exceptions.h"
 #include "string_manip.h"
 
 using namespace std;
@@ -17,6 +19,7 @@ vector<string> split(char* instring, const char* delim) {
    }
    return result;
 }
+
 vector<string> split(string const& instring, const char* delim) {
    char* buf = (char*)instring.c_str();
    return split(buf, delim);
@@ -64,4 +67,25 @@ string upper(string const& instring) {
 
 string upper(const char* instring) {
    return upper(string(instring));
+}
+
+int StringToInt(string const& s) {
+   int result;
+   if (!(istringstream(s) >> result))
+      throw InvalidInteger("Could not convert [[ " + s + " ]] to an integer!");
+   return result;
+}
+
+double StringToDouble(string const& s) {
+   double result;
+   if (!(istringstream(s) >> result))
+      throw InvalidDecimal("Could not convert [[ " + s + " ]] to a decimal!");
+   return result;
+}
+
+float StringToFloat(string const& s) {
+   float result;
+   if (!(istringstream(s) >> result))
+      throw InvalidDecimal("Could not convert [[ " + s + " ]] to a decimal!");
+   return result;
 }

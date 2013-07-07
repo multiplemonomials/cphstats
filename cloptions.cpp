@@ -1,10 +1,12 @@
 // cloptions.cpp: Manage the command-line options and parsing
 
+// Standard C++ headers
 #include <fstream>
-#include <cstring>
-#include <cstdlib>
-#include <cstdio>
+#include <iostream>
+
+// My headers
 #include "cloptions.h"
+#include "string_manip.h"
 #include "utilities.h"
 
 using namespace std;
@@ -39,191 +41,121 @@ debug_(false)
    marked[0] = true; // this is the program name
 
    while (i < argc) {
-      if (strncmp("-h", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+      string arg = string(argv[i]);
+      bool has_another = (i != argc - 1);
+      string argnext;
+      if (has_another)
+         argnext = string(argv[i+1]);
+
+      if (arg == "-h" || arg == "--help") {
          parse_return_ = HELP;
          break;
-     }else if (strncmp("-O", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+     }else if (arg == "-O" || arg == "--overwrite") {
          marked[i] = true;
          overwrite_ = true;
-     }else if (strncmp("--overwrite", argv[i], 11) == 0 && strlen(argv[i]) == 11) {
-         marked[i] = true;
-         overwrite_ = true;
-     }else if (strncmp("--help", argv[i], 6) == 0 && strlen(argv[i]) == 6) {
-         parse_return_ = HELP;
-         break;
-     }else if (strncmp("-V", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+     }else if (arg == "-V" || arg == "--version") {
          parse_return_ = VERSION;
          break;
-     }else if (strncmp("--version", argv[i], 9) == 0 && strlen(argv[i]) <= 9) {
-         parse_return_ = VERSION;
-         break;
-     }else if (strncmp("-i", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+     }else if (arg == "-i" || arg == "--cpin") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         cpin_ = string(argv[i]);
-     }else if (strncmp("--cpin", argv[i], 6) == 0 && strlen(argv[i]) == 6) {
+         cpin_ = argnext;
+     }else if (arg == "-o" || arg == "--calcpka-output") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         cpin_ = string(argv[i]);
-     }else if (strncmp("--calcpka-output", argv[i], 16) == 0 && 
-               strlen(argv[i]) == 16) {
+         output_ = argnext;
+     }else if (arg == "-v" || arg == "--verbose") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         output_ = string(argv[i]);
-     }else if (strncmp("-o", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         verbose_ = StringToInt(argnext);
+     }else if (arg == "-R" || arg == "--running-avg-out") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         output_ = string(argv[i]);
-     }else if (strncmp("-v", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         runavgout_ = argnext;
+     }else if (arg == "--chunk-out") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         verbose_ = atoi(argv[i]);
-     }else if (strncmp("--verbose", argv[i], 9) == 0 && strlen(argv[i]) == 9) {
+         chunkout_ = argnext;
+     }else if (arg == "--cumulative-out") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         verbose_ = atoi(argv[i]);
-     }else if (strncmp("-R", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         runavgout_ = string(argv[i]);
-     }else if (strncmp("--running-avg-out", argv[i], 17) == 0 && 
-               strlen(argv[i]) == 17) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         runavgout_ = string(argv[i]);
-     }else if (strncmp("--chunk-out", argv[i], 11) == 0 && strlen(argv[i]) == 11) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         chunkout_ = string(argv[i]);
-     }else if (strncmp("--cumulative-out", argv[i], 16) == 0 && 
-               strlen(argv[i]) == 16) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         cumout_ = string(argv[i]);
-     }else if (strncmp("--calcpka", argv[i], 9) == 0 && strlen(argv[i]) == 9) {
+         cumout_ = argnext;
+     }else if (arg == "--calcpka") {
          marked[i] = true;
          do_calcpka_ = true;
-     }else if (strncmp("--no-calcpka", argv[i], 12) == 0 && strlen(argv[i]) == 12) {
+     }else if (arg == "--no-calcpka") {
          marked[i] = true;
          do_calcpka_ = false;
-     }else if (strncmp("-r", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+     }else if (arg == "-r" || arg == "--running-avg") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         runavgwin_ = atoi(argv[i]);
-         if (runavgwin_ == 0) {
-            fprintf(stderr, "Error: Bad argument for running average window!\n");
-            parse_return_ = ERR;
-            break;
-         }
-     }else if (strncmp("-t", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         runavgwin_ = StringToInt(argnext);
+     }else if (arg == "-t" || arg == "--time-step") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         time_step_ = atof(argv[i]);
-     }else if (strncmp("--time-step", argv[i], 11) == 0 && strlen(argv[i]) == 11) {
+         time_step_ = StringToFloat(argnext);
+     }else if (arg == "--chunk") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         time_step_ = atof(argv[i]);
-     }else if (strncmp("--running-avg", argv[i], 13) == 0 && strlen(argv[i]) == 13) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         runavgwin_ = atoi(argv[i]);
-         if (runavgwin_ == 0) {
-            fprintf(stderr, "Error: Bad argument for running average window!\n");
-            parse_return_ = ERR;
-            break;
-         }
-     }else if (strncmp("--chunk", argv[i], 7) == 0 && strlen(argv[i]) == 7) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         chunksize_ = atoi(argv[i]);
-         if (chunksize_ == 0) {
-            fprintf(stderr, "Error: Bad argument for running average window!\n");
-            parse_return_ = ERR;
-            break;
-         }
-     }else if (strncmp("--cumulative", argv[i], 12) == 0 && strlen(argv[i]) == 12) {
+         chunksize_ = StringToInt(argnext);
+     }else if (arg == "--cumulative") {
          marked[i] = true;
          cumulative_ = true;
-     }else if (strncmp("--fix-remd", argv[i], 10) == 0 && strlen(argv[i]) == 10) {
+     }else if (arg == "--fix-remd") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         reorder_prefix_ = string(argv[i]);
-     }else if (strncmp("-n", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         reorder_prefix_ = argnext;
+     }else if (arg == "-n" || arg == "--interval") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         interval_ = atoi(argv[i]);
-     }else if (strncmp("--interval", argv[i], 10) == 0 && strlen(argv[i]) == 10) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         interval_ = atoi(argv[i]);
-     }else if (strncmp("-p", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         interval_ = StringToInt(argnext);
+     }else if (arg == "-p" || arg == "--protonated") {
          marked[i] = true;
          protonated_ = true;
-     }else if (strncmp("--protonated", argv[i], 12) == 0 && strlen(argv[i]) == 12) {
-         marked[i] = true;
-         protonated_ = true;
-     }else if (strncmp("-d", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         pKa_ = false;
+     }else if (arg == "-d" || arg == "--deprotonated") {
          marked[i] = true;
          protonated_ = false;
-     }else if (strncmp("--deprotonated", argv[i], 14) == 0 && strlen(argv[i]) == 14) {
-         marked[i] = true;
-         protonated_ = false;
-     }else if (strncmp("-a", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         pKa_ = false;
+     }else if (arg == "-a" || arg == "--pKa") {
          marked[i] = true;
          pKa_ = true;
-     }else if (strncmp("--pKa", argv[i], 5) == 0 && strlen(argv[i]) == 5) {
-         marked[i] = true;
-         pKa_ = true;
-     }else if (strncmp("--population", argv[i], 12) == 0 && strlen(argv[i]) == 12) {
+     }else if (arg == "--population") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         population_ = string(argv[i]);
-     }else if (strncmp("-c", argv[i], 2) == 0 && strlen(argv[i]) == 2) {
+         population_ = argnext;
+     }else if (arg == "-c" || arg == "--conditional") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         condprobs_.push_back( ConditionalProb(argv[i]) );
-     }else if (strncmp("--conditional", argv[i], 13) == 0 && strlen(argv[i]) == 13) {
+         condprobs_.push_back( ConditionalProb(argnext) );
+     }else if (arg == "--conditional-output") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         condprobs_.push_back( ConditionalProb(argv[i]) );
-     }else if (strncmp("--conditional-output", argv[i], 20) == 0 &&
-               strlen(argv[i]) == 20) {
+         condprobf_ = argnext;
+     }else if (arg == "--chunk-conditional") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
          marked[i] = true;
-         condprobf_ = string(argv[i]);
-     }else if (strncmp("--chunk-conditional", argv[i], 19) == 0 &&
-               strlen(argv[i]) == 19) {
-         marked[i++] = true;
-         if (i == argc) {parse_return_ = INSUFARGS; break;}
-         marked[i] = true;
-         condprob_chunk_ = string(argv[i]);
-     }else if (strncmp("--debug", argv[i], 7) == 0 && strlen(argv[i]) == 7) {
+         condprob_chunk_ = argnext;
+     }else if (arg == "--debug") {
          marked[i] = true;
          debug_ = true;
-     }else if (strncmp("-", argv[i], 1) == 0) {
-         fprintf(stderr, "Unrecognized command-line option: %s\n", argv[i]);
+     }else if (arg[0] == '-') {
+         cerr << "Unrecognized command-line option: " << arg << endl;
          parse_return_ = ERR;
          break;
       }
@@ -246,123 +178,120 @@ debug_(false)
 void CLOptions::Help() {
 
    Usage();
-   printf("\n");
-   printf("General Options:\n");
-   printf("    -h, --help     Print this help and exit.\n");
-   printf("    -V, --version  Print the version number and exit.\n");
-   printf("    -O, --overwrite\n");
-   printf("                   Allow existing outputs to be overwritten.\n");
-   printf("    --debug        Print out information about the files that are\n");
-   printf("                   being read in and used for the calculations.\n");
-   printf("\n");
-   printf("Input Files and Options:\n");
-   printf("    -i FILE, --cpin FILE\n");
-   printf("                   Input cpin file (from sander) with titrating residue\n");
-   printf("                   information.\n");
-   printf("    -t FLOAT, --time-step FLOAT\n");
-   printf("                   This is the time step in ps you used in your simulations.\n");
-   printf("                   It will be used to print data as a function of time.\n");
-   printf("                   Default is 2 fs (0.002)\n");
-   printf("\n");
-   printf("Output Files:\n");
-   printf("    -o FILE, --calcpka-output FILE\n");
-   printf("                   File to which the standard `calcpka'-type statistics\n");
-   printf("                   are written. Default is stdout\n");
-   printf("    -R FILE, --running-avg-out FILE\n");
-   printf("                   Output file where the running averages for each\n");
-   printf("                   residue is printed. Default is [running_avgs.dat]\n");
-   printf("    --chunk-out FILE\n");
-   printf("                   Output file where the protonated fraction calculated\n");
-   printf("                   over chunks of the simulation are printed.\n");
-   printf("                   Default is [chunk.dat]\n");
-   printf("    --cumulative-out FILE\n");
-   printf("                   Output file where the cumulative protonated fraction\n");
-   printf("                   is printed. Default is [cumulative.dat]\n");
-   printf("    --population FILE\n");
-   printf("                   Output file where protonation state populations are\n");
-   printf("                   printed for every state of every residue.\n");
-   printf("    --conditional-output FILE\n");
-   printf("                   Output file with requested conditional probabilities.\n");
-   printf("                   Default is [conditional_prob.dat].\n");
-   printf("    --chunk-conditional FILE\n");
-   printf("                   Prints a time series of the conditional probabilities over\n");
-   printf("                   a trajectory split up into chunks.\n");
-   printf("\n");
-   printf("Output Options:\n");
-   printf("  These options modify how the output files will appear\n");
-   printf("\n");
-   printf("    -v INT, --verbose INT\n");
-   printf("                   Controls how much information is printed to the\n");
-   printf("                   calcpka-style output file. Options are:\n");
-   printf("                      (0) Just print fraction protonated. [Default]\n");
-   printf("                      (1) Print everything calcpka prints.\n");
-   printf("    -n INT, --interval INT\n");
-   printf("                   An interval between which to print out time series data\n");
-   printf("                   like `chunks', `cumulative' data, and running averages.\n");
-   printf("                   It is also used as the 'window' of the conditional\n");
-   printf("                   probability time series (--chunk-conditional).\n");
-   printf("                   Default [1000]\n");
-   printf("    -p, --protonated\n");
-   printf("                   Print out protonation fraction instead of deprotonation\n");
-   printf("                   fraction in time series data (Default behavior).\n");
-   printf("    -d, --deprotonated\n");
-   printf("                   Print out deprotonation fraction instead of protonation\n");
-   printf("                   fraction in time series data.\n");
-   printf("    -a, --pKa      Print predicted pKas (via Henderson-Hasselbalch) in place\n");
-   printf("                   of fraction (de)protonated. This option overrides all\n");
-   printf("                   instances of -p/-d described above. NOT default behavior.\n");
-   printf("\n");
-   printf("Analysis Options:\n");
-   printf("  These options control which analyses are done. By default, only\n");
-   printf("  the original, calcpka-style analysis is done.\n");
-   printf("\n");
-   printf("    --calcpka      Triggers the calcpka-style output [On by default]\n");
-   printf("    --no-calcpka   Turns off the calcpka-style output\n");
-   printf("    -r WINDOW, --running-avg WINDOW\n");
-   printf("                   Defines a window size for a moving, running average\n");
-   printf("                   fraction protonated. <WINDOW> is the number of MD\n");
-   printf("                   steps (NOT the number of MC exchange attempts).\n");
-   printf("    --chunk WINDOW\n");
-   printf("                   Computes the pKa's over a chunk of the simulation of\n");
-   printf("                   size <WINDOW> time steps.\n");
-   printf("    --cumulative   Computes the cumulative fraction protonated over the\n");
-   printf("                   course of the trajectory.\n");
-   printf("    --fix-remd PREFIX\n");
-   printf("                   This option will trigger %s to reassemble the\n", prog_.c_str());
-   printf("                   titration data into pH-specific ensembles. This\n");
-   printf("                   is an exclusive mode of the program---no other\n");
-   printf("                   analyses will be done.\n");
-   printf("    -c CONDITIONAL, --conditional CONDITIONAL\n");
-   printf("                   Evaluates conditional probabilities. CONDITIONAL should be a\n");
-   printf("                   string of the format:\n");
-   printf("                         <resid>:<state>,<resid>:<state>,...\n");
-   printf("                   Where <resid> is the residue number in the prmtop (NOT the\n");
-   printf("                   cpin) and <state> is either the state number or (p)rotonated\n");
-   printf("                   or (d)eprotonated, case-insensitive\n");
-   printf("\n");
-   printf("This program analyzes constant pH output files (cpout) from Amber.\n");
-   printf("These output files can be compressed using gzip compression. The\n");
-   printf("compression will be detected automatically by the file name extension.\n");
-   printf("You must have the gzip headers for this functionality to work.\n");
-   
+   cout << endl;
+   cout << "General Options:" << endl;
+   cout << "    -h, --help     Print this help and exit." << endl;
+   cout << "    -V, --version  Print the version number and exit." << endl;
+   cout << "    -O, --overwrite" << endl;
+   cout << "                   Allow existing outputs to be overwritten." << endl;
+   cout << "    --debug        Print out information about the files that are" << endl;
+   cout << "                   being read in and used for the calculations." << endl;
+   cout << endl;
+   cout << "Input Files and Options:" << endl;
+   cout << "    -i FILE, --cpin FILE" << endl;
+   cout << "                   Input cpin file (from sander) with titrating residue" << endl;
+   cout << "                   information." << endl;
+   cout << "    -t FLOAT, --time-step FLOAT" << endl;
+   cout << "                   This is the time step in ps you used in your simulations." << endl;
+   cout << "                   It will be used to print data as a function of time." << endl;
+   cout << "                   Default is 2 fs (0.002)" << endl;
+   cout << endl;
+   cout << "Output Files:" << endl;
+   cout << "    -o FILE, --calcpka-output FILE" << endl;
+   cout << "                   File to which the standard `calcpka'-type statistics" << endl;
+   cout << "                   are written. Default is stdout" << endl;
+   cout << "    -R FILE, --running-avg-out FILE" << endl;
+   cout << "                   Output file where the running averages for each" << endl;
+   cout << "                   residue is printed. Default is [running_avgs.dat]" << endl;
+   cout << "    --chunk-out FILE" << endl;
+   cout << "                   Output file where the protonated fraction calculated" << endl;
+   cout << "                   over chunks of the simulation are printed." << endl;
+   cout << "                   Default is [chunk.dat]" << endl;
+   cout << "    --cumulative-out FILE" << endl;
+   cout << "                   Output file where the cumulative protonated fraction" << endl;
+   cout << "                   is printed. Default is [cumulative.dat]" << endl;
+   cout << "    --population FILE" << endl;
+   cout << "                   Output file where protonation state populations are" << endl;
+   cout << "                   printed for every state of every residue." << endl;
+   cout << "    --conditional-output FILE" << endl;
+   cout << "                   Output file with requested conditional probabilities." << endl;
+   cout << "                   Default is [conditional_prob.dat]." << endl;
+   cout << "    --chunk-conditional FILE" << endl;
+   cout << "                   Prints a time series of the conditional probabilities over" << endl;
+   cout << "                   a trajectory split up into chunks." << endl;
+   cout << endl;
+   cout << "Output Options:" << endl;
+   cout << "  These options modify how the output files will appear" << endl;
+   cout << endl;
+   cout << "    -v INT, --verbose INT" << endl;
+   cout << "                   Controls how much information is printed to the" << endl;
+   cout << "                   calcpka-style output file. Options are:" << endl;
+   cout << "                      (0) Just print fraction protonated. [Default]" << endl;
+   cout << "                      (1) Print everything calcpka prints." << endl;
+   cout << "    -n INT, --interval INT" << endl;
+   cout << "                   An interval between which to print out time series data" << endl;
+   cout << "                   like `chunks', `cumulative' data, and running averages." << endl;
+   cout << "                   It is also used as the 'window' of the conditional" << endl;
+   cout << "                   probability time series (--chunk-conditional)." << endl;
+   cout << "                   Default [1000]" << endl;
+   cout << "    -p, --protonated" << endl;
+   cout << "                   Print out protonation fraction instead of deprotonation" << endl;
+   cout << "                   fraction in time series data (Default behavior)." << endl;
+   cout << "    -d, --deprotonated" << endl;
+   cout << "                   Print out deprotonation fraction instead of protonation" << endl;
+   cout << "                   fraction in time series data." << endl;
+   cout << "    -a, --pKa      Print predicted pKas (via Henderson-Hasselbalch) in place" << endl;
+   cout << "                   of fraction (de)protonated. NOT default behavior." << endl;
+   cout << endl;
+   cout << "Analysis Options:" << endl;
+   cout << "  These options control which analyses are done. By default, only" << endl;
+   cout << "  the original, calcpka-style analysis is done." << endl;
+   cout << endl;
+   cout << "    --calcpka      Triggers the calcpka-style output [On by default]" << endl;
+   cout << "    --no-calcpka   Turns off the calcpka-style output" << endl;
+   cout << "    -r WINDOW, --running-avg WINDOW" << endl;
+   cout << "                   Defines a window size for a moving, running average" << endl;
+   cout << "                   fraction protonated. <WINDOW> is the number of MD" << endl;
+   cout << "                   steps (NOT the number of MC exchange attempts)." << endl;
+   cout << "    --chunk WINDOW" << endl;
+   cout << "                   Computes the pKa's over a chunk of the simulation of" << endl;
+   cout << "                   size <WINDOW> time steps." << endl;
+   cout << "    --cumulative   Computes the cumulative fraction protonated over the" << endl;
+   cout << "                   course of the trajectory." << endl;
+   cout << "    --fix-remd PREFIX" << endl;
+   cout << "                   This option will trigger " << prog_ << " to reassemble the " << endl;
+   cout << "                   titration data into pH-specific ensembles. This" << endl;
+   cout << "                   is an exclusive mode of the program---no other" << endl;
+   cout << "                   analyses will be done." << endl;
+   cout << "    -c CONDITIONAL, --conditional CONDITIONAL" << endl;
+   cout << "                   Evaluates conditional probabilities. CONDITIONAL should be a" << endl;
+   cout << "                   string of the format:" << endl;
+   cout << "                         <resid>:<state>,<resid>:<state>,..." << endl;
+   cout << "                   Where <resid> is the residue number in the prmtop (NOT the" << endl;
+   cout << "                   cpin) and <state> is either the state number or (p)rotonated" << endl;
+   cout << "                   or (d)eprotonated, case-insensitive" << endl;
+   cout << endl;
+   cout << "This program analyzes constant pH output files (cpout) from Amber." << endl;
+   cout << "These output files can be compressed using gzip compression. The" << endl;
+   cout << "compression will be detected automatically by the file name extension." << endl;
+   cout << "You must have the gzip headers for this functionality to work." << endl;
+
    return;
 }
 
 void CLOptions::Usage() {
-   printf("Usage: %s [-O] [-V] [-h] [-i <cpin>] [-t] [-o FILE] [-R FILE -r INT]\n", prog_.c_str());
-   printf("             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]\n");
-   printf("             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]\n");
-   printf("             [--population FILE] [-c CONDITION -c CONDITION -c ...]\n");
-   printf("             [--conditional-output FILE] [--chunk-conditional FILE]\n");
-   printf("             cpout1 [cpout2 [cpout3 ...] ]\n");
+   cout << "Usage: " << prog_ << " [-O] [-V] [-h] [-i <cpin>] [-t] [-o FILE] [-R FILE -r INT]" << endl;
+   cout << "             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]" << endl;
+   cout << "             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]" << endl;
+   cout << "             [--population FILE] [-c CONDITION -c CONDITION -c ...]" << endl;
+   cout << "             [--conditional-output FILE] [--chunk-conditional FILE]" << endl;
+   cout << "             cpout1 [cpout2 [cpout3 ...] ]" << endl;
 
    return;
 }
 
 void CLOptions::Version() {
-   printf("%s: Version %s\n", prog_.c_str(), VERSION_STR);
-
-   return;
+   cout << prog_ << ": Version " << VERSION_STR << endl;
 }
 
 int CLOptions::Parse() {
@@ -371,7 +300,7 @@ int CLOptions::Parse() {
    else if (parse_return_ == VERSION)
       Version();
    else if (parse_return_ == INSUFARGS) {
-      fprintf(stderr, "Insufficient arguments!\n");
+      cerr << "Insufficient arguments!" << endl;
       Usage();
   }else if (parse_return_ == ERR) {
       Usage();
@@ -383,75 +312,75 @@ int CLOptions::Parse() {
 int CLOptions::CheckInput() {
    int inerr = 0;
    if (runavgwin_ < 0) {
-      fprintf(stderr, "Error: -r/--running-avg window must be non-negative!\n");
+      cerr << "Error: -r/--running-avg window must be non-negative!" << endl;
       inerr = 1;
    }
 
    if (chunksize_ < 0) {
-      fprintf(stderr, "Error: --chunk window must be non-negative!\n");
+      cerr << "Error: --chunk window must be non-negative!" << endl;
       inerr = 1;
    }
 
    if (time_step_ <= 0) {
-      fprintf(stderr, "Error: --time-step must be a positive number!\n");
+      cerr << "Error: --time-step must be a positive number!" << endl;
       inerr = 1;
    }
 
    if (interval_ <= 0) {
-      fprintf(stderr, "Error: -n/--interval must be a positive integer!\n");
+      cerr << "Error: -n/--interval must be a positive integer!" << endl;
       inerr = 1;
    }
 
    // Make sure no files exist that we want to overwrite
    if (runavgwin_ > 0 && !overwrite_)
       if (fexists(runavgout_)) {
-         fprintf(stderr, "Error: %s exists; not overwriting.\n", runavgout_.c_str());
+         cerr << "Error: " << runavgout_ << " exists; not overwriting." << endl;
          inerr = 1;
       }
 
    if (!condprob_chunk_.empty() && !overwrite_)
       if (fexists(condprob_chunk_)) {
-         fprintf(stderr, "Error: %s exists; not overwriting.\n", condprob_chunk_.c_str());
+         cerr << "Error: " << condprob_chunk_ << " exists; not overwriting." << endl;
          inerr = 1;
       }
 
    if (do_calcpka_ && !overwrite_)
       if (!output_.empty() && fexists(output_)) {
-         fprintf(stderr, "Error: %s exists; not overwriting.\n", output_.c_str());
+         cerr << "Error: " << output_ << " exists; not overwriting." << endl;
          inerr = 1;
       }
 
    if (chunksize_ > 0 && !overwrite_)
       if (fexists(chunkout_)) {
-         fprintf(stderr, "Error: %s exists; not overwriting.\n", chunkout_.c_str());
+         cerr << "Error: " << chunkout_ << " exists; not overwriting." << endl;
          inerr = 1;
       }
 
    if (cumulative_ && !overwrite_)
       if (fexists(cumout_)) {
-         fprintf(stderr, "Error: %s exists; not overwriting.\n", cumout_.c_str());
+         cerr << "Error: " << cumout_ << " exists; not overwriting." << endl;
          inerr = 1;
       }
 
    if (!population_.empty() && !overwrite_)
       if (fexists(population_)) {
-         fprintf(stderr, "Error: %s exists; not overwriting.\n", population_.c_str());
+         cerr << "Error: " << population_ << " exists; not overwriting." << endl;
          inerr = 1;
       }
 
    if (!condprobf_.empty() && !overwrite_)
       if (fexists(condprobf_)) {
-         fprintf(stderr, "Error: %s exists; not overwriting.\n", condprobf_.c_str());
+         cerr << "Error: " << condprobf_ << " exists; not overwriting." << endl;
          inerr = 1;
       }
 
    // Make sure we provided a prefix and didn't accidentally just dump a bunch
    // of cpout files on the command line without a prefix
    if (!reorder_prefix_.empty() && fexists(reorder_prefix_)) {
-      fprintf(stderr, "--------| Interpreting %s as the new REMD file prefix. If this is\n", 
-              reorder_prefix_.c_str());
-      fprintf(stderr, "Warning | a cpout file, kill this program and re-run with a correct\n");
-      fprintf(stderr, "--------| REMD file prefix.\n");
+      cerr << "--------| Interpreting " << reorder_prefix_ << " as the new REMD file prefix. " 
+           << "If this is" << endl;
+      cerr << "Warning | a cpout file, kill this program and re-run with a correct" << endl;
+      cerr << "--------| REMD file prefix." << endl;
    }
 
    return inerr;
