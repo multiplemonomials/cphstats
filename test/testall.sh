@@ -30,7 +30,7 @@ compare() {
       return 0
    fi
 
-   diff -w $1 $2 > tmp 2>&1
+   diff $1 $2 > tmp 2>&1
 
    if [ $? -eq 0 ]; then
       echo "PASSED"

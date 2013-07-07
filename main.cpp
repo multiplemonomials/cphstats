@@ -1,6 +1,10 @@
 // main.cpp: Holds the main program
 
-#include <cstdio>
+// Standard C++ headers
+#include <iostream>
+#include <iomanip>
+
+// My headers
 #include "cpin.h"
 #include "cpout.h"
 #include "cloptions.h"
@@ -20,7 +24,7 @@ int main(int argc, char**argv) {
 
    // Check the input
    if (clopt.CheckInput()) {
-      fprintf(stderr, "Error: Input errors detected! See messages above.\n");
+      cerr << "Error: Input errors detected! See messages above." << endl;
       return 1;
    }
 
@@ -34,7 +38,7 @@ int main(int argc, char**argv) {
    Cpin my_cpin;
    if (clopt.REMDPrefix().empty()) {
       if ( clopt.Cpin().empty() ) {
-         fprintf(stderr, "Error: No cpin file provided!\n");
+         cerr << "Error: No cpin file provided!" << endl;
          return 1;
       }
       if ( my_cpin.Parse(clopt.Cpin()) )
@@ -43,24 +47,25 @@ int main(int argc, char**argv) {
       nres = (int) my_cpin.getTrescnt();
 
       if (nres <= 0) {
-         fprintf(stderr, "Error: Did not detect any residues in %s!\n",
-                 clopt.Cpin().c_str());
+         cerr << "Error: Did not detect any residues in " << 
+                 clopt.Cpin() << endl;
          return 1;
       }
       if (clopt.Debug()) {
-         printf("There are %d titratable residues defined in %s:\n",
-                nres, my_cpin.getFilename().c_str());
-         printf("They are:\n");
+         cout << "There are " << nres << " titratable residues defined in " <<
+                 my_cpin.getFilename() << ":" << endl;
+         cout << "They are:" << endl;
          for (Cpin::ResIterator it = my_cpin.begin(); it != my_cpin.end(); it++) {
-            printf("\t%3s %-3d (%d states) [ ", it->getResname().c_str(),
-                                             it->getResnum(), it->numStates());
+            cout << "\t" << setw(3) << it->getResname() << left << " " << 
+                    setw(3) << it->getResnum() << " (" << it->numStates() 
+                    << " states) [ ";
             for (int j = 0; j < it->numStates(); j++) {
                if (it->isProtonated(j))
-                  printf("P ");
+                  cout << "P ";
                else
-                  printf("D ");
+                  cout << "D ";
             }
-            printf("]\n");
+            cout << "]" << endl;
          }
       }
    } // if clopt.REMDPrefix().empty()
@@ -71,7 +76,7 @@ int main(int argc, char**argv) {
       CpoutFile c = CpoutFile(*it);
       // Skip over invalid cpouts
       if (!c.Valid()) {
-         fprintf(stderr, "Error: Cpout file %s is invalid! Skipping.\n", it->c_str());
+         cerr << "Error: Cpout file " << *it << " is invalid! Skipping." << endl;
          continue;
       }
       // For REMD fixing where a cpin is unnecessary, make sure all cpouts have
@@ -79,15 +84,18 @@ int main(int argc, char**argv) {
       if (nres <= 0) nres = c.Nres();
       // Skip over cpouts with a residue mismatch
       if (c.Nres() != nres) {
-         fprintf(stderr, "Error: Cpout file %s has %d residues. I expected %d.  Skipping.\n",
-                 it->c_str(), c.Nres(), my_cpin.getTrescnt());
+         cerr << "Error: Cpout file " << *it << " has " << c.Nres() <<
+                 " residues. I expected " << my_cpin.getTrescnt() <<
+                 ". Skipping." << endl;
          continue;
       }
-      if (clopt.Debug()) printf("Added [[ %s ]] to cpout list.\n", it->c_str());
+      if (clopt.Debug())
+         cout << "Added [[ " << *it << " ]] to cpout list." << endl;
       cpouts.push_back(c);
    }
 
-   if (clopt.Debug()) printf("Analyzing %d cpouts.\n", (int)clopt.Cpouts().size());
+   if (clopt.Debug()) 
+      cout << "Analyzing " << clopt.Cpouts().size() << " cpouts." << endl;
 
    // Special-case REMD re-ordering
    if (!clopt.REMDPrefix().empty())
@@ -134,7 +142,7 @@ int main(int argc, char**argv) {
       for (CLOptions::prob_iterator it = clopt.condbegin(); 
                                     it != clopt.condend(); it++)
          if (it->Set(my_cpin) == ConditionalProb::ERR) {
-            fprintf(stderr, "Quitting due to errors above.\n");
+            cerr << "Quitting due to errors above." << endl;
             return 1;
          }
 
@@ -147,7 +155,7 @@ int main(int argc, char**argv) {
       stats.PrintCondTimeseries(clopt.ConditionalChunkOut(), clopt.Interval(),
                                 clopt.CondProbs());
 
-   if (clopt.Debug()) printf("All done!\n");
+   if (clopt.Debug()) cout << "All done!" << endl;
 
    return 0;
 }

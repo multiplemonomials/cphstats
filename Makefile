@@ -1,6 +1,7 @@
 include config.h
 
 .NOTPARALLEL:clean install all
+.PHONY: test
 
 OBJS = main.o cpin.o parse_cpin.o string_manip.o cloptions.o test.o cpout.o \
        prottraj.o utilities.o conprob.o
