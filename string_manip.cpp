@@ -42,7 +42,7 @@ vector<string> split(char* instring) {
 string strip(string const& instring) {
    int first = -1;
    int last = 0;
-   for (uint i = 0; i < instring.size(); i++) {
+   for (size_t i = 0; i < instring.size(); i++) {
       if (instring[i] != ' ' && instring[i] != '\n' && instring[i] != '\r')
          last = i;
       if (first == -1 && (instring[i] == ' ' || instring[i] == '\n' ||

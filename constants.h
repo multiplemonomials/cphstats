@@ -11,6 +11,4 @@
 #define FN_LEN 256
 #define LINEBUF 512
 
-typedef unsigned int uint;
-
 #endif /* CONSTANTS_H */

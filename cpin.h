@@ -1,7 +1,6 @@
 #ifndef CPIN_H
 #define CPIN_H
 
-#include <cstring>
 #include <string>
 #include <vector>
 #include "constants.h"

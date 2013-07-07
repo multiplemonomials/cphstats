@@ -60,7 +60,7 @@ void test_cpouts(std::vector<CpoutFile> cpouts) {
       Record myrec;
       do {
          myrec = it->GetRecord();
-         for (uint j = 0; j < myrec.points.size(); j++)
+         for (size_t j = 0; j < myrec.points.size(); j++)
             statelist[myrec.points[j].residue].push_back(myrec.points[j].state);
       } while (!it->Done());
       i++;

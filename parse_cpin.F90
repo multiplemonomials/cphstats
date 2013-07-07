@@ -48,7 +48,7 @@ subroutine parse_cpin(trescnt, protcnt, stateinf, resname, cpin_name, ierr)
 
    ! The cpin name
 
-   character(len=FN_LEN) :: cpin_name
+   character(len=FN_LEN), intent(in) :: cpin_name
 
    ! The public functions
 
