@@ -98,7 +98,6 @@ int CpoutFile::GzGets(char* str, int num) {
 }
 
 int CpoutFile::AsciiGets(char* str, int num) {
-   fflush(stdout);
    if (fgets(str, num, fp_) == NULL) {
       return 1;
    }
