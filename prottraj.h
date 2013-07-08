@@ -1,6 +1,7 @@
 #ifndef PROTTRAJ_H
 #define PROTTRAJ_H
 #include <vector>
+#include <ostream>
 
 #include "conprob.h"
 #include "cpin.h"
@@ -23,8 +24,8 @@ class ProtTraj {
       void LoadCpout(CpoutFile);
 
       // Prints the calcpka-style output
-      void PrintCalcpka(FILE*);
-      void PrintCalcpka(FILE*, const int);
+      void PrintCalcpka(std::ostream &);
+      void PrintCalcpka(std::ostream &, const int);
 
       // Prints the desired values for each residue for chunks of the simulation
       // of given size (in time steps)

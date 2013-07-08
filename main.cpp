@@ -2,6 +2,7 @@
 
 // Standard C++ headers
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 
 // My headers
@@ -109,11 +110,11 @@ int main(int argc, char**argv) {
    // Do the normal calcpka-style output if requested
    if (clopt.Calcpka()) {
       if (clopt.Output().empty())
-         stats.PrintCalcpka(stdout);
+         stats.PrintCalcpka(cout);
       else {
-         FILE *fd = fopen(clopt.Output().c_str(), "w");
+         ofstream fd; fd.open(clopt.Output().c_str());
          stats.PrintCalcpka(fd);
-         fclose(fd);
+         fd.close();
       }
    }
 

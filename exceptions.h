@@ -22,4 +22,10 @@ class StringBufferOverflow : public std::runtime_error {
          std::runtime_error(s) {}
 };
 
+class FileIOError : public std::runtime_error {
+   public:
+      FileIOError(std::string const& s) :
+         std::runtime_error(s) {}
+};
+
 #endif /* EXCEPTIONS_H */
