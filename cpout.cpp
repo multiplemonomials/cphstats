@@ -1,12 +1,16 @@
 // cpout.cpp: Includes code to deal with and parse cpout files
 
+#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include "cpout.h"
+#include "exceptions.h"
 #include "string_manip.h"
 
-CpoutFile::CpoutFile(std::string const& fname) :
+using namespace std;
+
+CpoutFile::CpoutFile(string const& fname) :
 fp_(NULL),
 type_(ASCII),
 valid_(true),
@@ -17,14 +21,14 @@ nres_(0)
 {
    
    filename_ = fname;
-   if (fname.find_last_of(".") != std::string::npos) {
+   if (fname.find_last_of(".") != string::npos) {
       // Get the suffix
-      std::string sfx = fname.substr(fname.find_last_of('.'));
-      if (sfx == std::string(".bz2")) {
+      string sfx = fname.substr(fname.find_last_of('.'));
+      if (sfx == string(".bz2")) {
          type_ = BZIP;
-         fprintf(stderr, "Error: BZIP2 compression is not supported!\n");
+         cerr << "Error: BZIP2 compression not supported!" << endl;
          valid_ = false;
-     }else if (sfx == std::string(".gz"))
+     }else if (sfx == string(".gz"))
          type_ = GZIP;
    }
 
@@ -32,28 +36,28 @@ nres_(0)
    if (type_ == ASCII) {
       fp_ = fopen(fname.c_str(), "r");
       if (fp_ == NULL) {
-         fprintf(stderr, "Failed opening %s for reading.\n", fname.c_str());
+         cerr << "Failed opening " << fname << " for reading." << endl;
          valid_ = false;
       }
          
   }else if (type_ == GZIP) {
       gzfp_ = gzopen(fname.c_str(), "r");
       if (gzfp_ == NULL) {
-         fprintf(stderr, "Failed opening gzip file %s\n", fname.c_str());
+         cerr << "Failed opening gzip file " << fname << endl;
          valid_ = false;
       }
    }
    // Parse out the first (full) record to determine some information
    char buf[LINEBUF+1];
    if (valid_ && Gets(buf, LINEBUF)) {
-      fprintf(stderr, "Could not read from %s\n", fname.c_str());
+      cerr << "Could not read from " << fname << endl;
       Close();
       valid_ = false;
   }else if (valid_) {
       if (sscanf(buf, "Solvent pH: %f\n", &orig_ph_) == 1) {
          Gets(buf, LINEBUF);
          if (sscanf(buf, "Monte Carlo step size: %d\n", &step_size_) != 1) {
-            fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
+            cerr << "Did not recognize the format of cpout " << fname << "." << endl;
             valid_ = false;
             Close();
          }
@@ -61,7 +65,7 @@ nres_(0)
          Gets(buf, LINEBUF); // Time
          // Get the starting time
          if (valid_ && sscanf(buf, "Time: %f\n", &start_time_) != 1) {
-            fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
+            cerr << "Did not recognize format of cpout " << fname << "." << endl;
             valid_ = false;
             Close();
          }
@@ -80,7 +84,7 @@ nres_(0)
             Rewind();
          }
      }else {
-         fprintf(stderr, "Did not recognize the format of cpout %s.\n", fname.c_str());
+         cerr << "Did not recognize format of cpout " << fname << "." << endl;
          Close();
          valid_ = false;
       }
@@ -88,7 +92,7 @@ nres_(0)
 }
 
 CpoutFile::CpoutFile(const char* fname) {
-   CpoutFile(std::string(fname));
+   CpoutFile(string(fname));
 }
 
 int CpoutFile::GzGets(char* str, int num) {
@@ -168,6 +172,8 @@ Record CpoutFile::GetRecord() {
       return result;
    }
 
-   // Should never get here, but need this to eliminate compiler warnings
+   throw InternalError("Cpout parsing error: should not be here");
+
+   // Will never get here, but need this to eliminate compiler warnings
    return empty_record;
 }

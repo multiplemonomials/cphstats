@@ -28,4 +28,10 @@ class FileIOError : public std::runtime_error {
          std::runtime_error(s) {}
 };
 
+class InternalError : public std::runtime_error {
+   public:
+      InternalError(std::string const& s) :
+         std::runtime_error(s) {}
+};
+
 #endif /* EXCEPTIONS_H */
