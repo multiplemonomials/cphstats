@@ -41,8 +41,12 @@ time_step_(0)
 /// Loads a full cpout file point by point
 void ProtTraj::LoadCpout(CpoutFile cpout) {
    if (time_step_ == 0) time_step_ = cpout.StepSize();
-   while (!cpout.Done())
-      AddPoint(cpout.GetRecord());
+   while (!cpout.Done()) {
+      Record r = cpout.GetRecord();
+      // Do not add an empty record
+      if (r.points.empty()) continue;
+      AddPoint(r);
+   }
 }
 
 /// Loads a single frame into the trajectory
@@ -64,7 +68,7 @@ void ProtTraj::PrintCalcpka(ostream& fd, const int start) {
 
    // Start with the first point, but skip it in the iteration
    last_point_ = statelist_[start];
-   for (int i = start + 1; i < nframes_; i++) {
+   for (int i = start + 1; i < nframes_ + 1; i++) {
       int j = 0;
       for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
          transitions[j] += (int) (rit->isProtonated(last_point_[j]) !=
@@ -117,14 +121,20 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
       iss << rit->getResname() << " " << rit->getResnum();
       fp << setw(8) << iss.str() << " ";
    }
-   fp << "Total Frac. Prot." << endl;
+   if (print_prot)
+      fp << "Total Frac. Prot." << endl;
+   else if (print_pka)
+      fp << "              pKa" << endl;
+   else
+      fp << "Total Frac. Depr." << endl;
 
    int interval = window / time_step_;
    int first = 0;
-   while (first + interval <= nframes_) {
+   while (first < nframes_+1) {
       vector<long long int> nprot(nres_, 0ll);
       long long int totprot = 0ll;
-      for (int i = first; i < first + interval; i++) {
+      int last = MIN(nframes_+1, first + interval);
+      for (int i = first; i < last; i++) {
          int j = 0;
          for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
             long long int protadd = (long long int) (rit->isProtonated(statelist_[i][j]));
@@ -137,7 +147,7 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
       int j = 0;
       fp << setw(10) << time_step_*(first + interval / 2) << " ";
       for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
-         double fracprot = (double)nprot[j] / (double)interval;
+         double fracprot = (double)nprot[j] / (double)(last - first);
          if (print_prot) {
             // We want the fraction protonated
             fp << setprecision(5) << setw(8) << fracprot << " ";
@@ -151,7 +161,8 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
          }
          j++;
       }
-      fp << setprecision(6) << setw(17) << (double)totprot/(double)interval << endl;
+      fp << setprecision(6) << setw(17) << (double)totprot/(double)(last - first)
+         << endl;
       first += interval;
    }
 
@@ -180,7 +191,7 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
    vector<long long int> nprot(nres_, 0ll);
    long long int totprot = 0ll;
    int c = 0; // simple counter
-   for (int i = 0; i < nframes_; i++) {
+   for (int i = 1; i < nframes_ + 1; i++) {
       
       { // scope this
       int j = 0;
@@ -196,7 +207,7 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
          c = 0;
          // Now we print a point
          int j = 0;
-         fp << setw(10) << i*time_step_ << " ";
+         fp << setw(10) << (i-1)*time_step_ << " ";
          for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
             double fracprot = (double)nprot[j] / (double)(i+1);
             if (print_prot) {
@@ -212,7 +223,7 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
             }
             j++;
          }
-         fp << setprecision(6) << setw(17) << (double)totprot / (double)(i+1) << endl;
+         fp << setprecision(6) << setw(17) << (double)totprot / (double)(i) << endl;
       }
       c++; // heh
    }
@@ -239,7 +250,7 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
    }
    fp << "Total Frac. Prot." << endl;
 
-   for (int i = 0; i < nframes_; i+= interval/time_step_) {
+   for (int i = 1; i < nframes_ + 1; i+= interval/time_step_) {
       vector<long long int> nprot(nres_, 0ll);
       long long int totprot = 0ll;
       // Loop over all frames we should include here
@@ -298,7 +309,7 @@ void ProtTraj::PrintProtPop(string const& fname) {
    }
 
    // Now loop through the entire trajectory, building the population list
-   for (int i = 0; i < nframes_; i++) {
+   for (int i = 1; i < nframes_ + 1; i++) {
       ProtVector curst = statelist_[i];
       for (int j = 0; j < nres_; j++)
          pop_counts[j].state_cnt[ statelist_[i][j] ] += 1ll;
@@ -361,7 +372,7 @@ void ProtTraj::PrintCondProb(string const& fname,
         it != condprobs.end(); it++) {
       // Now loop through the whole trajectory
       long long int counted = 0;
-      for (int i = 0; i < nframes_; i++)
+      for (int i = 1; i < nframes_ + 1; i++)
          counted += (long long int) it->SatisfiedBy(statelist_[i]);
 
       double frac = (double) counted / (double) nframes_;
@@ -395,15 +406,16 @@ void ProtTraj::PrintCondTimeseries(string const& fname, const int window,
 
    int interval = window / time_step_;
    int first = 0;
-   while (first + interval <= nframes_) {
+   while (first < nframes_+1) {
       vector<long long int> nprot(nres_, 0ll);
       fp << setw(10) << first*time_step_;
+      int last = MIN(nframes_+1, first+interval);
       for (vector<ConditionalProb>::const_iterator it = condprobs.begin();
            it != condprobs.end(); it++) {
          long long int counted = 0ll;
-         for (int i = first; i < first + interval; i++)
+         for (int i = first; i < last; i++)
             counted += (long long int) it->SatisfiedBy(statelist_[i]);
-         double frac = (double) counted / (double) interval;
+         double frac = (double) counted / (double) (last-first);
          fp << " " << setw(max_size) << frac;
       }
       fp << endl;

@@ -1,8 +1,8 @@
 Solvent pH is    2.000
 GL4 7   : Offset  1.802  Pred  3.802  Frac Prot 0.984 Transitions       979
-HIP 15  : Offset  3.462  Pred  5.462  Frac Prot 1.000 Transitions        22
+HIP 15  : Offset  3.465  Pred  5.465  Frac Prot 1.000 Transitions        22
 AS4 18  : Offset -0.033  Pred  1.967  Frac Prot 0.481 Transitions      9046
-GL4 35  : Offset  3.209  Pred  5.209  Frac Prot 0.999 Transitions        30
+GL4 35  : Offset  3.211  Pred  5.211  Frac Prot 0.999 Transitions        30
 AS4 48  : Offset -0.205  Pred  1.795  Frac Prot 0.384 Transitions      4890
 AS4 52  : Offset  0.102  Pred  2.102  Frac Prot 0.559 Transitions      8462
 AS4 66  : Offset -1.068  Pred  0.932  Frac Prot 0.079 Transitions      1282
