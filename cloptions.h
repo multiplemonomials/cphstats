@@ -1,7 +1,7 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "1.2.1"
+#define VERSION_STR "1.2.2"
 
 #include <sstream>
 #include <string>

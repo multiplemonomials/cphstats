@@ -121,10 +121,8 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
       iss << rit->getResname() << " " << rit->getResnum();
       fp << setw(8) << iss.str() << " ";
    }
-   if (print_prot)
+   if (print_prot || print_pka)
       fp << "Total Frac. Prot." << endl;
-   else if (print_pka)
-      fp << "              pKa" << endl;
    else
       fp << "Total Frac. Depr." << endl;
 
@@ -161,8 +159,11 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
          }
          j++;
       }
-      fp << setprecision(6) << setw(17) << (double)totprot/(double)(last - first)
-         << endl;
+      double fracprot = (double)totprot/(double)(last - first);
+      if (print_prot || print_pka)
+         fp << setprecision(6) << setw(17) << fracprot << endl;
+      else
+         fp << setprecision(6) << setw(17) << 1.0-fracprot << endl;
       first += interval;
    }
 
@@ -185,7 +186,10 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
       iss << rit->getResname() << " " << rit->getResnum();
       fp << setw(8) << iss.str() << " ";
    }
-   fp << "Total Frac. Prot." << endl;
+   if (print_prot || print_pka)
+      fp << "Total Frac. Prot." << endl;
+   else
+      fp << "Total Frac. Depr." << endl;
 
    // Now go through the trajectory
    vector<long long int> nprot(nres_, 0ll);
@@ -223,7 +227,11 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
             }
             j++;
          }
-         fp << setprecision(6) << setw(17) << (double)totprot / (double)(i) << endl;
+         double fracprot = (double)totprot / (double)i;
+         if (print_prot || print_pka)
+            fp << setprecision(6) << setw(17) << fracprot << endl;
+         else
+            fp << setprecision(6) << setw(17) << 1.0-fracprot << endl;
       }
       c++; // heh
    }
@@ -248,7 +256,10 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
       iss << rit->getResname() << " " << rit->getResnum();
       fp << setw(8) << iss.str() << " ";
    }
-   fp << "Total Frac. Prot." << endl;
+   if (print_prot || print_pka)
+      fp << "Total Frac. Prot." << endl;
+   else
+      fp << "Total Frac. Depr." << endl;
 
    for (int i = 1; i < nframes_ + 1; i+= interval/time_step_) {
       vector<long long int> nprot(nres_, 0ll);
@@ -283,7 +294,11 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
          }
          j++;
      }
-     fp << setprecision(6) << setw(17) << (double)totprot/(double)n << endl;
+     double fracprot = (double)totprot / (double)n;
+     if (print_prot || print_pka)
+        fp << setprecision(6) << setw(17) << totprot << endl;
+     else
+        fp << setprecision(6) << setw(17) << 1.0-totprot << endl;
    }
 
    fp.close();
