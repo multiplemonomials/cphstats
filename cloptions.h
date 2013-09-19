@@ -1,7 +1,7 @@
 #ifndef CLOPTIONS_H
 #define CLOPTIONS_H
 
-#define VERSION_STR "1.2.2"
+#define VERSION_STR "1.2.3"
 
 #include <sstream>
 #include <string>
@@ -56,6 +56,7 @@ class CLOptions {
       std::string ConditionalOutput() const    { return condprobf_;      }
       std::string ConditionalChunkOut() const  { return condprob_chunk_; }
       bool Debug() const                       { return debug_;          }
+      bool Expert() const                      { return expert_;         }
 
       // Provide an iterator over the cpouts
       typedef std::vector<std::string>::const_iterator cpout_iterator;
@@ -115,6 +116,8 @@ class CLOptions {
       bool debug_;
       /// Output file for chunk conditional time series
       std::string condprob_chunk_;
+      /// Are you an expert? If so, I will not warn about using REMD files
+      bool expert_;
 
 };
 

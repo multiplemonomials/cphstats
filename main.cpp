@@ -29,7 +29,7 @@ int main(int argc, char**argv) {
       return 1;
    }
 
-// test_clopt(clopt);
+// test_clopt(clopt); /* Uncomment to test command-line parsing */
 
    int nres = 0; // number of residues (for consistency tests)
 
@@ -104,6 +104,9 @@ int main(int argc, char**argv) {
 
    ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord());
    for (cpout_iterator it = cpouts.begin(); it != cpouts.end(); it++) {
+      // If we are here, then warn if we are about to use a REMD file
+      if (!clopt.Expert())
+         it->WarnRemd();
       stats.LoadCpout(*it);
    }
 

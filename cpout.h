@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+#include <iostream>
+
 // To support compression
 #include "zlib.h"
 
@@ -38,6 +40,11 @@ class CpoutFile {
       int StepSize() const   { return step_size_;       }
       float pH() const       { return orig_ph_;         }
       float startTime() const{ return start_time_;      }
+      void WarnRemd() const {
+            if (remd_file_)
+               std::cerr << "Warning: " << filename_ << " comes from a pH-REMD simulation! Not valid "
+                    << "for pKa calculations." << std::endl << std::endl;
+                                   }
 
       std::string Filename() { return filename_; }
 
@@ -75,6 +82,7 @@ class CpoutFile {
       int step_size_;    // Monte carlo step size
       int nres_;         // Number of residues defined in this cpout
       float start_time_; // The time in the first full record
+      bool remd_file_;   // Is this file from a REMD run?
 };
 
 #endif /* CPOUT_H */

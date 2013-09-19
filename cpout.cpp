@@ -17,7 +17,8 @@ valid_(true),
 done_(false),
 orig_ph_(0.0f),
 step_size_(0),
-nres_(0)
+nres_(0),
+remd_file_(false)
 {
    
    filename_ = fname;
@@ -77,9 +78,12 @@ nres_(0)
             int state;
             float pH;
             nres_ = 0;
-            while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
+            int val = sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH);
+            remd_file_ = val == 3; // This line should tell us if we have a REMD file
+            while (val >= 2) {
                nres_++;
                Gets(buf, LINEBUF);
+               val = sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH);
             }
             Rewind();
          }

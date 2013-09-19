@@ -1,4 +1,4 @@
-#Time step    GL4 7   HIP 15   AS4 18   GL4 35   AS4 48   AS4 52   AS4 66   AS4 87  AS4 101  AS4 119 Total Frac. Prot.
+#Time step    GL4 7   HIP 15   AS4 18   GL4 35   AS4 48   AS4 52   AS4 66   AS4 87  AS4 101  AS4 119  Total Avg. Prot.
       1000   3.6463   6.3032     -inf   6.3032     -inf     -inf     -inf     -inf   4.1565     -inf          3.900498
       2000   3.5084   6.6031     -inf   6.6031     -inf   2.0022     -inf     -inf   4.3814     -inf          3.962594
       3000   3.4935   6.7789   2.7347   6.7789     -inf   2.9475     -inf     -inf   4.2428   1.8254          4.014975

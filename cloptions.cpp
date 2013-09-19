@@ -22,7 +22,8 @@ interval_(1000),
 protonated_(true),
 time_step_(0.002f),
 pKa_(false),
-debug_(false)
+debug_(false),
+expert_(false)
 {
    
    // Initialize some strings
@@ -154,6 +155,12 @@ debug_(false)
      }else if (arg == "--debug") {
          marked[i] = true;
          debug_ = true;
+     }else if (arg == "--expert") {
+         marked[i] = true;
+         expert_ = true;
+     }else if (arg == "--novice") {
+         marked[i] = true;
+         expert_ = false;
      }else if (arg[0] == '-') {
          cerr << "Unrecognized command-line option: " << arg << endl;
          parse_return_ = ERR;
@@ -186,6 +193,11 @@ void CLOptions::Help() {
    cout << "                   Allow existing outputs to be overwritten." << endl;
    cout << "    --debug        Print out information about the files that are" << endl;
    cout << "                   being read in and used for the calculations." << endl;
+   cout << "    --expert       I will consider you an expert user and NOT warn" << endl;
+   cout << "                   you if you try to compute statistics from REMD-based" << endl;
+   cout << "                   files before using --fix-remd [NOT default behavior]" << endl;
+   cout << "    --novice       I will warn you if you try to use REMD-based files" << endl;
+   cout << "                   to compute statistics. [Default behavior]" << endl;
    cout << endl;
    cout << "Input Files and Options:" << endl;
    cout << "    -i FILE, --cpin FILE" << endl;
