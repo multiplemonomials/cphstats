@@ -283,6 +283,10 @@ void CLOptions::Help() {
    cout << "                   Evaluates conditional probabilities. CONDITIONAL should be a" << endl;
    cout << "                   string of the format:" << endl;
    cout << "                         <resid>:<state>,<resid>:<state>,..." << endl;
+   cout << "                     or" << endl;
+   cout << "                         <resid>:PROT,<resid>:DEPROT,..." << endl;
+   cout << "                     or" << endl;
+   cout << "                         <resid>:<state1>;<state2>,<resid>:PROT,..." << endl;
    cout << "                   Where <resid> is the residue number in the prmtop (NOT the" << endl;
    cout << "                   cpin) and <state> is either the state number or (p)rotonated" << endl;
    cout << "                   or (d)eprotonated, case-insensitive" << endl;
