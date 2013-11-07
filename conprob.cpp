@@ -79,10 +79,10 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
             int state = StringToInt(*sit);
             if (state >= cpin.getResidues()[residx].numStates()) {
                cerr << "Error: State index " << state << " out of range for residue "
-                    << resid << "!" << endl;
+                    << residx << "!" << endl;
                return ERR;
             }
-            active_states_[resid][state] = true;
+            active_states_[residx][state] = true;
          }
      }else if (iss >> stateidx) {
          if (stateidx >= cpin.getResidues()[residx].numStates()) {
