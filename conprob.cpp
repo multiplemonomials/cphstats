@@ -69,7 +69,22 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
       
       int stateidx;
       istringstream iss(parts[1]);
-      if (iss >> stateidx) {
+      if (parts[1].find(";") != string::npos) {
+         /* We have specified multiple protonation states we want to match for
+          * a single residue
+          */
+         vector<string> selres = split(parts[1], ";");
+         for (vector<string>::const_iterator sit = selres.begin();
+               sit != selres.end(); sit++) {
+            int state = StringToInt(*sit);
+            if (state >= cpin.getResidues()[residx].numStates()) {
+               cerr << "Error: State index " << state << " out of range for residue "
+                    << resid << "!" << endl;
+               return ERR;
+            }
+            active_states_[resid][state] = true;
+         }
+     }else if (iss >> stateidx) {
          if (stateidx >= cpin.getResidues()[residx].numStates()) {
             cerr << "Error: State index " << stateidx << " out of range for residue "
                  << resid << "!" << endl;
