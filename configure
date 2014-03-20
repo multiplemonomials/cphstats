@@ -10,6 +10,8 @@ parser.add_option('-d', '--debug', dest='debug', default=False,
                   action='store_true', help='Trigger the debug flags.')
 parser.add_option('-n', '--no-opt', dest='opt', default=True,
                   action='store_false', help='Disable compiler optimizations.')
+parser.add_option('--no-zlib', action='store_false', default=True, dest='zlib',
+                  help='Compile without zlib support')
 parser.add_option('-p', '--program', dest='prog', default='cphstats',
                   help='The name of the resulting program. Default %default.')
 parser.add_option('--prefix', dest='prefix', default='/usr/local',
@@ -39,7 +41,7 @@ if arg[0].lower() in ('gnu', 'gcc'):
    f90 = 'gfortran'
    ld = 'g++'
    ldflags = ['-lgfortran', '-lz']
-   cppflags = ['-Wall', '-DHASGZ']
+   cppflags = ['-Wall']
    f90flags = ['-Wall']
 
    if opt.opt:
@@ -63,7 +65,7 @@ elif arg[0].lower() == 'clang':
    ld = 'clang++'
    ldflags = ['-lgfortran', '-lz']
 
-   cppflags = ['-Wall', '-DHASGZ']
+   cppflags = ['-Wall']
    f90flags = ['-Wall']
 
    if opt.opt:
@@ -86,7 +88,7 @@ else:
    f90 = 'ifort'
    ld = 'ifort'
    ldflags = ['-nofor_main', '-lstdc++', '-lz']
-   cppflags = ['-Wall', '-DHASGZ']
+   cppflags = ['-Wall']
    f90flags = ['-warn', 'all']
 
    if opt.opt:
@@ -102,6 +104,9 @@ else:
       cppflags.extend(['-g', '-debug'])
       f90flags.extend(['-g', '-debug'])
       ldflags.extend(['-g', '-debug'])
+
+if opt.zlib:
+   cppflags.append('-DHASGZ')
 
 confighopts = dict(cpp=cpp, f90=f90, ld=ld, ldflags=' '.join(ldflags),
                cppflags=' '.join(cppflags), f90flags=' '.join(f90flags),
