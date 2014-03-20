@@ -39,7 +39,7 @@ if arg[0].lower() in ('gnu', 'gcc'):
    f90 = 'gfortran'
    ld = 'g++'
    ldflags = ['-lgfortran', '-lz']
-   cppflags = ['-Wall']
+   cppflags = ['-Wall', '-DHASGZ']
    f90flags = ['-Wall']
 
    if opt.opt:
@@ -63,7 +63,7 @@ elif arg[0].lower() == 'clang':
    ld = 'clang++'
    ldflags = ['-lgfortran', '-lz']
 
-   cppflags = ['-Wall']
+   cppflags = ['-Wall', '-DHASGZ']
    f90flags = ['-Wall']
 
    if opt.opt:
@@ -86,7 +86,7 @@ else:
    f90 = 'ifort'
    ld = 'ifort'
    ldflags = ['-nofor_main', '-lstdc++', '-lz']
-   cppflags = ['-Wall']
+   cppflags = ['-Wall', '-DHASGZ']
    f90flags = ['-warn', 'all']
 
    if opt.opt:
