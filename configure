@@ -28,8 +28,8 @@ if len(arg) > 1:
    parser.print_help()
    sys.exit(1)
 
-if not arg[0].lower() in ('gnu', 'intel', 'gcc'):
-   sys.exit("Unrecognized compiler [%s]. Choose 'gnu' or 'intel'.\n" % arg[0])
+if not arg[0].lower() in ('gnu', 'intel', 'gcc', 'clang'):
+   sys.exit("Unrecognized compiler [%s]. Choose 'gnu' 'intel' or 'clang'.\n" % arg[0])
 
 f = open('config.h', 'w')
 
@@ -46,6 +46,30 @@ if arg[0].lower() in ('gnu', 'gcc'):
       cppflags.extend(['-O3', '-mtune=native'])
       f90flags.extend(['-O3', '-mtune=native'])
       ldflags.extend(['-O3', '-mtune=native'])
+   else:
+      cppflags.append('-O0')
+      f90flags.append('-O0')
+      ldflags.append('-O0')
+
+   if opt.debug:
+      cppflags.append('-g')
+      f90flags.append('-g')
+      ldflags.append('-g')
+
+elif arg[0].lower() == 'clang':
+   # clang compilers
+   cpp = 'clang++'
+   f90 = 'gfortran'
+   ld = 'clang++'
+   ldflags = ['-lgfortran', '-lz']
+
+   cppflags = ['-Wall']
+   f90flags = ['-Wall']
+
+   if opt.opt:
+      cppflags.extend(['-O3'])
+      f90flags.extend(['-O3'])
+      ldflags.extend(['-O3'])
    else:
       cppflags.append('-O0')
       f90flags.append('-O0')
