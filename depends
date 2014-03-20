@@ -1,17 +1,18 @@
-cpin.h: constants.h
 main.cpp: cpin.h cpout.h cloptions.h prottraj.h test.h types.h utilities.h
-test.h: cloptions.h cpout.h
-cpout.h: constants.h
-string_manip.cpp: constants.h string_manip.h
-prottraj.cpp: prottraj.h constants.h
-conprob.cpp: conprob.h string_manip.h
-prottraj.h: conprob.h cpin.h cpout.h types.h
-cpout.cpp: cpout.h string_manip.h
-utilities.cpp: utilities.h
-conprob.h: cpin.h types.h
-cloptions.cpp: cloptions.h utilities.h
-cpin.cpp: cpin.h string_manip.h
-types.h: cpout.h
-cloptions.h: conprob.h
 utilities.h: cpout.h types.h
+cpout.h: constants.h
+prottraj.h: conprob.h cpin.h cpout.h types.h
 test.cpp: constants.h test.h
+cpin.h: constants.h
+cpout.cpp: cpout.h exceptions.h string_manip.h
+conprob.cpp: conprob.h string_manip.h
+utilities.cpp: utilities.h
+cloptions.cpp: cloptions.h string_manip.h utilities.h
+string_manip.h: exceptions.h
+conprob.h: cpin.h types.h
+cloptions.h: conprob.h exceptions.h
+test.h: cloptions.h cpout.h
+prottraj.cpp: constants.h exceptions.h prottraj.h
+cpin.cpp: constants.h cpin.h exceptions.h string_manip.h
+types.h: cpout.h
+string_manip.cpp: constants.h exceptions.h string_manip.h

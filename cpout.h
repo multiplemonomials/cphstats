@@ -8,7 +8,9 @@
 #include <iostream>
 
 // To support compression
-#include "zlib.h"
+#ifdef HASGZ
+#  include "zlib.h"
+#endif
 
 #include "constants.h"
 
@@ -57,20 +59,32 @@ class CpoutFile {
    private:
       // Auto-dispatch
       int Gets(char* c, int i) { if (type_ == ASCII) return AsciiGets(c, i);
-                                 if (type_ == GZIP) return GzGets(c, i); 
+#                                ifdef HASGZ
+                                 if (type_ == GZIP) return GzGets(c, i);
+#                                endif
                                  return 1;}
       void Rewind() { if (type_ == ASCII) fseek(fp_, 0, SEEK_SET);
-                      if (type_ == GZIP) gzseek(gzfp_, 0, SEEK_SET); }
+#                     ifdef HASGZ
+                      if (type_ == GZIP) gzseek(gzfp_, 0, SEEK_SET);
+#                     endif
+                    }
 
       void Close() { if (type_ == ASCII) fclose(fp_);
-                     if (type_ == GZIP) gzclose(gzfp_); }
+#                    ifdef HASGZ
+                     if (type_ == GZIP) gzclose(gzfp_);
+#                    endif
+                   }
       // Real methods
+#     ifdef HASGZ
       int GzGets(char*, int);
+#     endif
       int AsciiGets(char*, int);
 
       // File objects
       FILE *fp_;
+#     ifdef HASGZ
       gzFile gzfp_;
+#     endif
 
       // File type (ASCII? Gzip?)
       FileType type_;

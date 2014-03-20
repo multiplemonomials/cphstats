@@ -42,11 +42,16 @@ remd_file_(false)
       }
          
   }else if (type_ == GZIP) {
+#     ifdef HASGZ
       gzfp_ = gzopen(fname.c_str(), "r");
       if (gzfp_ == NULL) {
          cerr << "Failed opening gzip file " << fname << endl;
          valid_ = false;
       }
+#     else
+      cerr << "Error: Compiled without support for GZIP compression!" << endl;
+      valid_ = false;
+#     endif
    }
    // Parse out the first (full) record to determine some information
    char buf[LINEBUF+1];
@@ -98,13 +103,13 @@ remd_file_(false)
 CpoutFile::CpoutFile(const char* fname) {
    CpoutFile(string(fname));
 }
-
+#ifdef HASGZ
 int CpoutFile::GzGets(char* str, int num) {
    if (gzgets(gzfp_, str, num) == NULL)
       return 1;
    return 0;
 }
-
+#endif
 int CpoutFile::AsciiGets(char* str, int num) {
    if (fgets(str, num, fp_) == NULL) {
       return 1;

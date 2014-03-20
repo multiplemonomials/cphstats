@@ -97,6 +97,11 @@ int main(int argc, char**argv) {
 
    if (clopt.Debug()) 
       cout << "Analyzing " << clopt.Cpouts().size() << " cpouts." << endl;
+   if (cpouts.size() != clopt.Cpouts().size()) {
+     cerr << "Error: Number of Cpout files " << cpouts.size() << 
+             " does not equal number specified: " << clopt.Cpouts().size() << endl;
+     return 1;
+   }
 
    // Special-case REMD re-ordering
    if (!clopt.REMDPrefix().empty())
