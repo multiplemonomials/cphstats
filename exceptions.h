@@ -2,6 +2,7 @@
 #define EXCEPTIONS_H
 /// Defines the exceptions used in this program
 
+#include <exception>
 #include <stdexcept>
 
 class InvalidInteger : public std::runtime_error {
@@ -32,6 +33,9 @@ class InternalError : public std::runtime_error {
    public:
       InternalError(std::string const& s) :
          std::runtime_error(s) {}
+};
+
+class CpoutFinished : public std::exception {
 };
 
 #endif /* EXCEPTIONS_H */

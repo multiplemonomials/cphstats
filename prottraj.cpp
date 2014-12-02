@@ -42,7 +42,12 @@ time_step_(0)
 void ProtTraj::LoadCpout(CpoutFile cpout) {
    if (time_step_ == 0) time_step_ = cpout.StepSize();
    while (!cpout.Done()) {
-      Record r = cpout.GetRecord();
+      Record r;
+      try {
+         r = cpout.GetRecord();
+      } catch ( CpoutFinished &e ) {
+         break;
+      }
       // Do not add an empty record
       if (r.points.empty()) continue;
       AddPoint(r);

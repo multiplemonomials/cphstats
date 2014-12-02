@@ -59,7 +59,11 @@ void test_cpouts(std::vector<CpoutFile> cpouts) {
       fprintf(stdout, "Analyzing Cpout file %s.\n", it->Filename().c_str());
       Record myrec;
       do {
+         try {
          myrec = it->GetRecord();
+         } catch (CpoutFinished &e) {
+            break;
+         }
          for (size_t j = 0; j < myrec.points.size(); j++)
             statelist[myrec.points[j].residue].push_back(myrec.points[j].state);
       } while (!it->Done());

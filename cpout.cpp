@@ -120,19 +120,15 @@ int CpoutFile::AsciiGets(char* str, int num) {
 Record CpoutFile::GetRecord() {
    char buf[LINEBUF+1];
 
-   // Create an empty record for return
-   Record empty_record;
-   empty_record.pH = 0.0f; empty_record.full = false;
-   empty_record.time_step = 0; empty_record.time = 0.0f;
-
    if (Gets(buf, LINEBUF)) {
       done_ = true;
-      return empty_record;
+      throw CpoutFinished();
    }
    Record result;
    float pH;
    int res;
    int state;
+   result.pH = 0.0f;
    result.full = false;
    if (sscanf(buf, "Solvent pH: %f\n", &pH) == 1) {
       result.full = true;
@@ -156,6 +152,9 @@ Record CpoutFile::GetRecord() {
       return result;
   }else {
       int s = sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH);
+      // If this is a REMD run, assign the pH
+      if (s == 3)
+         result.pH = pH;
       RecordPoint pt;
       pt.state = state; pt.residue = res;
       result.points.push_back(pt);
@@ -164,9 +163,6 @@ Record CpoutFile::GetRecord() {
          Close();
          return result;
       }
-      // If this is a REMD run, assign the pH
-      if (s == 3)
-         result.pH = pH;
       // Get more residues from a multi-site move
       while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
          RecordPoint opt;
@@ -184,5 +180,5 @@ Record CpoutFile::GetRecord() {
    throw InternalError("Cpout parsing error: should not be here");
 
    // Will never get here, but need this to eliminate compiler warnings
-   return empty_record;
+   return result;
 }

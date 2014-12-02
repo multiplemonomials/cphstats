@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include "exceptions.h"
 #include "utilities.h"
 
 using namespace std;
@@ -48,13 +49,33 @@ int sort_remd_files(CpoutList cpouts, string const& prefix,
       string fname = prefix + string(buf);
       it->second = fopen(fname.c_str(), "w");
    }
+   Record rec;
+   // Keep track of whether or not we assign all records to a file. If not, we
+   // need to warn people
+   bool all_assigned = true;
    // Now go through every frame of every cpout and sort the records
    bool done = false;
    for (cpout_iterator it = cpouts.begin(); it != cpouts.end(); it++)
       done = done || it->Done();
    while (!done) {
       for (cpout_iterator it = cpouts.begin(); it != cpouts.end(); it++) {
-         Record rec = it->GetRecord();
+         try {
+            rec = it->GetRecord();
+         } catch ( CpoutFinished &e ) {
+            /* This cpout file is done, but it might be truncated earlier than
+             * the others. So cycle through the rest of the cpout files and make
+             * sure we get all of the available data
+             */
+            continue;
+         }
+         /* Only write this record if it actually maps to a real file, but keep
+          * track of whether or not we are "ignoring" data so we don't do so
+          * silently.
+          */
+         if (filemap.count(rec.pH) == 0) {
+            all_assigned = false;
+            continue;
+         }
          if (rec.full) {
             fprintf(filemap[rec.pH], "Solvent pH: %8.5f\n", rec.pH);
             fprintf(filemap[rec.pH], "Monte Carlo step size: %8d\n", it->StepSize());
@@ -78,5 +99,11 @@ int sort_remd_files(CpoutList cpouts, string const& prefix,
    for (RemdMap::const_iterator it = filemap.begin(); it != filemap.end(); it++)
       fclose(it->second);
 
+   if (!all_assigned) {
+      cerr << "WARNING: not all data records were assigned to a specific cpout file" << endl
+           << "         this can happen, for instance, if you did *not* provide all" << endl
+           << "         of the replica cpout files to cphstats to process. Check" << endl
+           << "         your results carefully!" << endl;
+   }
    return 0;
 }
