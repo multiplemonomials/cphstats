@@ -2,6 +2,7 @@
 
 from optparse import OptionParser
 import sys
+import os
 
 epilog = '<compiler> must be either "gnu", "intel", or "clang"'
 
@@ -20,10 +21,30 @@ parser.add_option('--prefix', dest='prefix', default='/usr/local',
 
 opt, arg = parser.parse_args()
 
-if len(arg) < 1:
+if len(arg) < 1 and not 'CC' in os.environ and not 'CXX' in os.environ:
    sys.stderr.write("No compiler found! Must specify gnu or intel.\n")
    parser.print_help()
    sys.exit(1)
+elif 'CXX' in os.environ:
+   if 'g++' in os.environ['CXX']:
+      arg.append('gcc')
+   elif 'clang++' in os.environ['CXX']:
+      arg.append('clang')
+   elif 'icpc' in os.environ['CXX']:
+      arg.append('intel')
+   else:
+      sys.stderr.write('Unrecognized C++ compiler %s' % os.environ['CXX'])
+elif 'CC' in os.environ:
+   if 'gcc' in os.environ['CC']:
+      arg.append('gcc')
+   elif 'clang' in os.environ['C']:
+      arg.append('clang')
+   elif 'icc' in os.environ['C']:
+      arg.append('intel')
+   else:
+      sys.stderr.write('Unrecognized C compiler %s' % os.environ['CXX'])
+else:
+   sys.stderr.write('No compiler provided or detected from the environment')
 
 if len(arg) > 1:
    sys.stderr.write("Too many command-line arguments found.\n")
