@@ -60,7 +60,7 @@ void test_cpouts(std::vector<CpoutFile> cpouts) {
       Record myrec;
       do {
          try {
-         myrec = it->GetRecord();
+            myrec = it->GetRecord();
          } catch (CpoutFinished &e) {
             break;
          }

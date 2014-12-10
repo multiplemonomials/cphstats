@@ -46,7 +46,7 @@ class CpoutFile {
             if (remd_file_)
                std::cerr << "Warning: " << filename_ << " comes from a pH-REMD simulation! Not valid "
                     << "for pKa calculations." << std::endl << std::endl;
-                                   }
+      }
 
       std::string Filename() { return filename_; }
 
