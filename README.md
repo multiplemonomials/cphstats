@@ -3,9 +3,15 @@ cphstats
 
 This is a program for analyzing the results of constant pH MD simulations (and
 constant pH replica exchange MD simulations) that you can run using the Amber
-programs `sander' and `pmemd'. Support in pmemd was added after the release of
-Amber 12 and will be available in Amber 14 in 2014. Likewise, support for
-pH-REMD will be available in Amber 14 as well.
+programs `sander' and `pmemd'.
+
+Build Status
+============
+
+[![Linux Build Status](https://travis-ci.org/swails/cphmd_tools.svg?branch=master)](https://travis-ci.org/swails/cphmd_tools)
+
+Details
+=======
 
 This program replicates the (limited) functionality of the Fortran program
 calcpka.F90 (which I wrote a couple years ago) that is released with AmberTools.
@@ -19,9 +25,12 @@ to do what I needed it to do would have been difficult. I still included some
 Fortran code to parse the namelist input (since certain cprestart files are
 Fortran-generated and may have a format that is compiler-dependent).
 
-Therefore, building this program requires a working Fortran and C++ compiler
-with the ability to cross-link them. There is a configure script that will build
-a config.h file. Both the intel and GNU compilers are supported. To build the
+Compiling
+=========
+
+Building this program requires a working Fortran and C++ compiler with the
+ability to cross-link them. There is a configure script that will build a
+config.h file. Both the intel and GNU compilers are supported. To build the
 program, type:
 
 ```
