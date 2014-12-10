@@ -151,7 +151,9 @@ compare conditional_chunks.dat.save conditional_chunks.dat
 echo ""
 if [ $NFAIL -ne 0 ]; then
    echo "Detected $NFAIL failure(s)."
+   exit 1
 else
    echo "All tests passed."
+   exit 0
 fi
 echo ""
