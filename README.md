@@ -1,3 +1,6 @@
+cphstats
+========
+
 This is a program for analyzing the results of constant pH MD simulations (and
 constant pH replica exchange MD simulations) that you can run using the Amber
 programs `sander' and `pmemd'. Support in pmemd was added after the release of
@@ -21,17 +24,23 @@ with the ability to cross-link them. There is a configure script that will build
 a config.h file. Both the intel and GNU compilers are supported. To build the
 program, type:
 
+```
 ./configure --prefix /path/to/install/location gnu
 make && make install
+```
 
 By default, the prefix /usr/local.  If you wish to install in your home
 directory, run
 
+```
 ./configure --prefix $HOME gnu
 make && make install
+```
 
-This will create a program "cphstats" in the prefix/bin directory. You can run
+This will create a program `cphstats` in the `prefix/bin` directory. You can run
 
+```
 cphstats --help
+```
 
 to get a full usage statement.
