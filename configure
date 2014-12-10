@@ -3,7 +3,7 @@
 from optparse import OptionParser
 import sys
 
-epilog = '<compiler> must be either "gnu" or "intel"'
+epilog = '<compiler> must be either "gnu", "intel", or "clang"'
 
 parser = OptionParser(usage='%prog [Options] <compiler>', epilog=epilog)
 parser.add_option('-d', '--debug', dest='debug', default=False,
