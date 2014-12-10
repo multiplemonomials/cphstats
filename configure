@@ -37,9 +37,9 @@ elif 'CXX' in os.environ:
 elif 'CC' in os.environ:
    if 'gcc' in os.environ['CC']:
       arg.append('gcc')
-   elif 'clang' in os.environ['C']:
+   elif 'clang' in os.environ['CC']:
       arg.append('clang')
-   elif 'icc' in os.environ['C']:
+   elif 'icc' in os.environ['CC']:
       arg.append('intel')
    else:
       sys.stderr.write('Unrecognized C compiler %s' % os.environ['CXX'])

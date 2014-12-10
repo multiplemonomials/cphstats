@@ -1,4 +1,6 @@
 language: cpp
+before_install:
+    - sudo apt-get install gfortran
 compiler:
     - gcc
     - clang
