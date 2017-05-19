@@ -60,10 +60,18 @@ remd_file_(false)
       Close();
       valid_ = false;
   }else if (valid_) {
+#ifdef REDOX
+      if (sscanf(buf, "Redox potential: %f V\n", &orig_ph_) == 1) {
+#else
       if (sscanf(buf, "Solvent pH: %f\n", &orig_ph_) == 1) {
+#endif
          Gets(buf, LINEBUF);
          if (sscanf(buf, "Monte Carlo step size: %d\n", &step_size_) != 1) {
+#ifdef REDOX
+            cerr << "Did not recognize the format of ceout " << fname << "." << endl;
+#else
             cerr << "Did not recognize the format of cpout " << fname << "." << endl;
+#endif
             valid_ = false;
             Close();
          }
@@ -71,7 +79,11 @@ remd_file_(false)
          Gets(buf, LINEBUF); // Time
          // Get the starting time
          if (valid_ && sscanf(buf, "Time: %f\n", &start_time_) != 1) {
-            cerr << "Did not recognize format of cpout " << fname << "." << endl;
+#ifdef REDOX
+            cerr << "Did not recognize the format of ceout " << fname << "." << endl;
+#else
+            cerr << "Did not recognize the format of cpout " << fname << "." << endl;
+#endif
             valid_ = false;
             Close();
          }
@@ -83,17 +95,29 @@ remd_file_(false)
             int state;
             float pH;
             nres_ = 0;
+#ifdef REDOX
+            int val = sscanf(buf, "Residue %d State: %d E: %f V\n", &res, &state, &pH);
+#else
             int val = sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH);
+#endif
             remd_file_ = val == 3; // This line should tell us if we have a REMD file
             while (val >= 2) {
                nres_++;
                Gets(buf, LINEBUF);
+#ifdef REDOX
+               val = sscanf(buf, "Residue %d State: %d E: %f V\n", &res, &state, &pH);
+#else
                val = sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH);
+#endif
             }
             Rewind();
          }
      }else {
-         cerr << "Did not recognize format of cpout " << fname << "." << endl;
+#ifdef REDOX
+         cerr << "Did not recognize the format of ceout " << fname << "." << endl;
+#else
+         cerr << "Did not recognize the format of cpout " << fname << "." << endl;
+#endif
          Close();
          valid_ = false;
       }
@@ -130,7 +154,11 @@ Record CpoutFile::GetRecord() {
    int state;
    result.pH = 0.0f;
    result.full = false;
+#ifdef REDOX
+   if (sscanf(buf, "Redox potential: %f V\n", &pH) == 1) {
+#else
    if (sscanf(buf, "Solvent pH: %f\n", &pH) == 1) {
+#endif
       result.full = true;
       result.pH = pH;
       Gets(buf, LINEBUF); // Monte Carlo step size
@@ -139,7 +167,11 @@ Record CpoutFile::GetRecord() {
       Gets(buf, LINEBUF); // Time:
       sscanf(buf, "Time: %f\n", &result.time);
       Gets(buf, LINEBUF); // Residue
+#ifdef REDOX
+      while (sscanf(buf, "Residue %d State: %d E: %f V\n", &res, &state, &pH) >= 2) {
+#else
       while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
+#endif
          RecordPoint pt;
          pt.state = state; pt.residue = res;
          result.points.push_back(pt);
@@ -151,7 +183,11 @@ Record CpoutFile::GetRecord() {
       }
       return result;
   }else {
+#ifdef REDOX
+      int s = sscanf(buf, "Residue %d State: %d E: %f V\n", &res, &state, &pH);
+#else
       int s = sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH);
+#endif
       // If this is a REMD run, assign the pH
       if (s == 3)
          result.pH = pH;
@@ -164,7 +200,11 @@ Record CpoutFile::GetRecord() {
          return result;
       }
       // Get more residues from a multi-site move
+#ifdef REDOX
+      while (sscanf(buf, "Residue %d State: %d E: %f V\n", &res, &state, &pH) >= 2) {
+#else
       while (sscanf(buf, "Residue %d State: %d pH: %f\n", &res, &state, &pH) >= 2) {
+#endif
          RecordPoint opt;
          opt.state = state; opt.residue = res;
          result.points.push_back(opt);
@@ -177,7 +217,11 @@ Record CpoutFile::GetRecord() {
       return result;
    }
 
+#ifdef REDOX
+   throw InternalError("Ceout parsing error: should not be here");
+#else
    throw InternalError("Cpout parsing error: should not be here");
+#endif
 
    // Will never get here, but need this to eliminate compiler warnings
    return result;

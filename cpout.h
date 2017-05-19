@@ -44,8 +44,13 @@ class CpoutFile {
       float startTime() const{ return start_time_;      }
       void WarnRemd() const {
             if (remd_file_)
+#ifdef REDOX
+               std::cerr << "Warning: " << filename_ << " comes from a E-REMD simulation! Not valid "
+                    << "for Eo calculations." << std::endl << std::endl;
+#else
                std::cerr << "Warning: " << filename_ << " comes from a pH-REMD simulation! Not valid "
                     << "for pKa calculations." << std::endl << std::endl;
+#endif
       }
 
       std::string Filename() { return filename_; }

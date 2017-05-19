@@ -12,7 +12,11 @@ class ProtTraj {
 
    public:
       // Constructors
+#ifdef REDOX
+      ProtTraj(Cpin*, float, Record const&, const float);
+#else
       ProtTraj(Cpin*, float, Record const&);
+#endif
 
       // Destructor
 //    ~ProtTraj();
@@ -73,6 +77,17 @@ class ProtTraj {
 
       // Monte carlo time step
       int time_step_;
+
+#ifdef REDOX
+      // Temperature
+      float temp0_;
+
+      // Boltzmann constant in kcal/(mol.K)
+      const double KB_;
+
+      // Faraday constant in kcal/(mol.V)
+      const double FARADAY_;
+#endif
 
       typedef struct {
          std::vector<long long int> state_cnt;

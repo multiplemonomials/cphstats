@@ -1,0 +1,22 @@
+2,11c2,11
+< GL4 7   : Offset  1.802  Pred  3.802  Frac Prot 0.984 Transitions       979
+< HIP 15  : Offset  3.465  Pred  5.465  Frac Prot 1.000 Transitions        22
+< AS4 18  : Offset -0.033  Pred  1.967  Frac Prot 0.481 Transitions      9046
+< GL4 35  : Offset  3.211  Pred  5.211  Frac Prot 0.999 Transitions        30
+< AS4 48  : Offset -0.205  Pred  1.795  Frac Prot 0.384 Transitions      4890
+< AS4 52  : Offset  0.102  Pred  2.102  Frac Prot 0.559 Transitions      8462
+< AS4 66  : Offset -1.068  Pred  0.932  Frac Prot 0.079 Transitions      1282
+< AS4 87  : Offset  0.338  Pred  2.338  Frac Prot 0.685 Transitions      6726
+< AS4 101 : Offset  1.446  Pred  3.446  Frac Prot 0.965 Transitions      1813
+< AS4 119 : Offset  0.237  Pred  2.237  Frac Prot 0.633 Transitions      8306
+---
+> GL4 7   : Offset  1.802  Pred  3.802  Frac Prot 0.9845 Transitions       979
+> HIP 15  : Offset  3.465  Pred  5.465  Frac Prot 0.9997 Transitions        22
+> AS4 18  : Offset -0.033  Pred  1.967  Frac Prot 0.4812 Transitions      9046
+> GL4 35  : Offset  3.211  Pred  5.211  Frac Prot 0.9994 Transitions        30
+> AS4 48  : Offset -0.205  Pred  1.795  Frac Prot 0.3841 Transitions      4890
+> AS4 52  : Offset  0.102  Pred  2.102  Frac Prot 0.5587 Transitions      8462
+> AS4 66  : Offset -1.068  Pred  0.932  Frac Prot 0.0787 Transitions      1282
+> AS4 87  : Offset  0.338  Pred  2.338  Frac Prot 0.6854 Transitions      6726
+> AS4 101 : Offset  1.446  Pred  3.446  Frac Prot 0.9654 Transitions      1813
+> AS4 119 : Offset  0.237  Pred  2.237  Frac Prot 0.6330 Transitions      8306

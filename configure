@@ -14,7 +14,9 @@ parser.add_option('-n', '--no-opt', dest='opt', default=True,
 parser.add_option('--no-zlib', action='store_false', default=True, dest='zlib',
                   help='Compile without zlib support')
 parser.add_option('-p', '--program', dest='prog', default='cphstats',
-                  help='The name of the resulting program. Default %default.')
+                  help='The name of the resulting pH program. Default %default.')
+parser.add_option('-r', '--program2', dest='prog2', default='cestats',
+                  help='The name of the resulting Redox potential program. Default %default.')
 parser.add_option('--prefix', dest='prefix', default='/usr/local',
                   help='Installation destination. Default is current directory')
 
@@ -44,7 +46,7 @@ elif 'CC' in os.environ:
    else:
       sys.stderr.write('Unrecognized C compiler %s' % os.environ['CXX'])
 else:
-   sys.stderr.write('No compiler provided or detected from the environment')
+   sys.stderr.write('No compiler provided or detected from the environment.\n')
 
 if len(arg) > 1:
    sys.stderr.write("Too many command-line arguments found.\n")
@@ -131,7 +133,7 @@ if opt.zlib:
 
 confighopts = dict(cpp=cpp, f90=f90, ld=ld, ldflags=' '.join(ldflags),
                cppflags=' '.join(cppflags), f90flags=' '.join(f90flags),
-               confline=' '.join(sys.argv), prog=opt.prog, prefix=opt.prefix)
+               confline=' '.join(sys.argv), prog=opt.prog, prog2=opt.prog2, prefix=opt.prefix)
 f.write("""# configured with [[ %(confline)s ]]
 
 # Compilers
@@ -140,12 +142,16 @@ F90 = %(f90)s
 LD = %(ld)s
 
 # Flags
-F90FLAGS = %(f90flags)s
-CXXFLAGS = %(cppflags)s
-LDFLAGS = %(ldflags)s
+F90FLAGS = -DPH %(f90flags)s
+CXXFLAGS = -DPH %(cppflags)s
+LDFLAGS = -DPH %(ldflags)s
+F90FLAGS2 = -DREDOX %(f90flags)s
+CXXFLAGS2 = -DREDOX %(cppflags)s
+LDFLAGS2 = -DREDOX %(ldflags)s
 
 # Name of the program
 PROGNAME = %(prog)s
+PROGNAME2 = %(prog2)s
 PREFIX = %(prefix)s
 """ % confighopts)
 f.close()

@@ -1,0 +1,9 @@
+There are 1 titratable residues defined in lys-iron.cein:
+They are:
+	 FE 4   (2 states) [ D P ]
+Added [[ md2_ceout.E_0.75000.gz ]] to ceout list.
+Added [[ md3_ceout.E_0.75000.gz ]] to ceout list.
+Added [[ md4_ceout.E_0.75000.gz ]] to ceout list.
+Added [[ md5_ceout.E_0.75000.gz ]] to ceout list.
+Analyzing 4 ceouts.
+All done!

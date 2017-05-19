@@ -39,7 +39,11 @@ int main(int argc, char**argv) {
    Cpin my_cpin;
    if (clopt.REMDPrefix().empty()) {
       if ( clopt.Cpin().empty() ) {
+#ifdef REDOX
+         cerr << "Error: No cein file provided!" << endl;
+#else
          cerr << "Error: No cpin file provided!" << endl;
+#endif
          return 1;
       }
       if ( my_cpin.Parse(clopt.Cpin()) )
@@ -77,7 +81,11 @@ int main(int argc, char**argv) {
       CpoutFile c = CpoutFile(*it);
       // Skip over invalid cpouts
       if (!c.Valid()) {
+#ifdef REDOX
+         cerr << "Error: Ceout file " << *it << " is invalid! Skipping." << endl;
+#else
          cerr << "Error: Cpout file " << *it << " is invalid! Skipping." << endl;
+#endif
          continue;
       }
       // For REMD fixing where a cpin is unnecessary, make sure all cpouts have
@@ -85,20 +93,34 @@ int main(int argc, char**argv) {
       if (nres <= 0) nres = c.Nres();
       // Skip over cpouts with a residue mismatch
       if (c.Nres() != nres) {
+#ifdef REDOX
+         cerr << "Error: Ceout file " << *it << " has " << c.Nres() <<
+#else
          cerr << "Error: Cpout file " << *it << " has " << c.Nres() <<
+#endif
                  " residues. I expected " << my_cpin.getTrescnt() <<
                  ". Skipping." << endl;
          continue;
       }
       if (clopt.Debug())
+#ifdef REDOX
+         cout << "Added [[ " << *it << " ]] to ceout list." << endl;
+#else
          cout << "Added [[ " << *it << " ]] to cpout list." << endl;
+#endif
       cpouts.push_back(c);
    }
 
    if (clopt.Debug()) 
+#ifdef REDOX
+      cout << "Analyzing " << clopt.Cpouts().size() << " ceouts." << endl;
+   if (cpouts.size() != clopt.Cpouts().size()) {
+     cerr << "Error: Number of Ceout files " << cpouts.size() << 
+#else
       cout << "Analyzing " << clopt.Cpouts().size() << " cpouts." << endl;
    if (cpouts.size() != clopt.Cpouts().size()) {
      cerr << "Error: Number of Cpout files " << cpouts.size() << 
+#endif
              " does not equal number specified: " << clopt.Cpouts().size() << endl;
      return 1;
    }
@@ -107,7 +129,11 @@ int main(int argc, char**argv) {
    if (!clopt.REMDPrefix().empty())
       return sort_remd_files(cpouts, clopt.REMDPrefix(), clopt.Overwrite());
 
+#ifdef REDOX
+   ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord(), clopt.Temperature());
+#else
    ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord());
+#endif
    for (cpout_iterator it = cpouts.begin(); it != cpouts.end(); it++) {
       // If we are here, then warn if we are about to use a REMD file
       if (!clopt.Expert())

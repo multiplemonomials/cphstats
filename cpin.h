@@ -12,8 +12,13 @@ typedef struct {
 } StateInfo;
 
 extern "C" {
+#ifdef REDOX
+   void parse_cein_(int*, int[TITR_STATES_C], StateInfo[TITR_RES_C],
+                        char[TITR_RES_C+1][40], char[FN_LEN], int*);
+#else
    void parse_cpin_(int*, int[TITR_STATES_C], StateInfo[TITR_RES_C],
                         char[TITR_RES_C+1][40], char[FN_LEN], int*);
+#endif
 }
 
 /// A titratable residue
@@ -45,6 +50,18 @@ class TitratableResidue {
       bool isProtonated(int state) const { return protonated_[state]; }
       // Determine how many protons are in a specific state
       int numProtons(int state) const { return protcnts_[state]; }
+#ifdef REDOX
+      // Computing the maximum and the minimum number of electrons at ELECCNT on cein, in order to get the value of v of the Nerst equation
+      int getvNerst() const {
+       int nelecmin = numProtons(0);
+       int nelecmax = numProtons(0);
+         for (int j = 1; j < numStates(); j++) {
+           nelecmax = (numProtons(j) > nelecmax) ? numProtons(j) : nelecmax;
+           nelecmin = (numProtons(j) < nelecmin) ? numProtons(j) : nelecmin;
+         }
+       return (nelecmax-nelecmin);
+      }
+#endif
 
    private:
       /// How many protons are in each state?

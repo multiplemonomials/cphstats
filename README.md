@@ -5,6 +5,13 @@ This is a program for analyzing the results of constant pH MD simulations (and
 constant pH replica exchange MD simulations) that you can run using the Amber
 programs `sander' and `pmemd'.
 
+cestats
+========
+
+This is a program for analyzing the results of constant Redox potential MD simulations (and
+constant Redox potential replica exchange MD simulations) that you can run using the Amber
+programs `sander' and `pmemd'.
+
 Build Status
 ============
 
