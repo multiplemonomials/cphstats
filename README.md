@@ -8,7 +8,7 @@ programs `sander' and `pmemd'.
 Build Status
 ============
 
-[![Linux Build Status](https://travis-ci.org/swails/cphstats.svg?branch=master)](https://travis-ci.org/Amber-MD/cphstats)
+[![Linux Build Status](https://travis-ci.org/Amber-MD/cphstats.svg?branch=master)](https://travis-ci.org/Amber-MD/cphstats)
 
 Details
 =======
