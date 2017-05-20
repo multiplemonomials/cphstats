@@ -3,6 +3,8 @@ include config.h
 .NOTPARALLEL:clean install all
 .PHONY: test
 
+PROGNAME = cphstats
+
 OBJS = main.o cpin.o parse_cpin.o string_manip.o cloptions.o test.o cpout.o \
        prottraj.o utilities.o conprob.o
 
@@ -12,10 +14,10 @@ $(PROGNAME): $(OBJS)
 	$(LD) -o $(PROGNAME) $(OBJS) $(LDFLAGS)
 
 install: $(PROGNAME)
-	/bin/mv $(PROGNAME) $(PREFIX)/bin
+	/bin/mv $(PROGNAME) $(BASEDIR)/bin
 
 uninstall:
-	/bin/rm -f $(PREFIX)/bin/$(PROGNAME)
+	/bin/rm -f $(BASEDIR)/bin/$(PROGNAME)
 
 .SUFFIXES: .F90 .cpp .o
 
