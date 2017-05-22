@@ -8,6 +8,10 @@ OBJS = main.ph.o cpin.ph.o parse_cpin.ph.o string_manip.ph.o cloptions.ph.o test
        
 OBJS2 = main.redox.o cpin.redox.o parse_cpin.redox.o string_manip.redox.o cloptions.redox.o test.redox.o cpout.redox.o \
        prottraj.redox.o utilities.redox.o conprob.redox.o
+       
+PROGNAME  = cphstats
+
+PROGNAME2 = cestats
 
 all: $(PROGNAME) $(PROGNAME2)
 
@@ -18,12 +22,12 @@ $(PROGNAME2): $(OBJS2)
 	$(LD) -o $(PROGNAME2) $(OBJS2) $(LDFLAGS2)
 
 install: $(PROGNAME) $(PROGNAME2)
-	/bin/mv $(PROGNAME) $(PREFIX)/bin
-	/bin/mv $(PROGNAME2) $(PREFIX)/bin
+	/bin/mv $(PROGNAME) $(BASEDIR)/bin
+	/bin/mv $(PROGNAME2) $(BASEDIR)/bin
 
 uninstall:
-	/bin/rm -f $(PREFIX)/bin/$(PROGNAME)
-	/bin/rm -f $(PREFIX)/bin/$(PROGNAME2)
+	/bin/rm -f $(BASEDIR)/bin/$(PROGNAME)
+	/bin/rm -f $(BASEDIR)/bin/$(PROGNAME2)
 
 .SUFFIXES: .F90 .cpp .ph.o .redox.o
 
@@ -45,9 +49,11 @@ depends::
 clean:
 	/bin/rm -f $(OBJS) $(OBJS2)
 	cd test_ph && ./testall.sh clean
+	cd test_redox && ./testall.sh clean
 
 test: $(PROGNAME) $(PROGNAME2)
 	cd test_ph && ./testall.sh
+	cd test_redox && ./testall.sh
 
 new: clean $(PROGNAME) $(PROGNAME2)
 
