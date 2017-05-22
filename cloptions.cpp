@@ -21,6 +21,9 @@ overwrite_(false),
 interval_(1000),
 protonated_(true),
 time_step_(0.002f),
+#ifdef REDOX
+temp0_(300.0f),
+#endif
 pKa_(false),
 debug_(false),
 expert_(false)
@@ -57,12 +60,20 @@ expert_(false)
      }else if (arg == "-V" || arg == "--version") {
          parse_return_ = VERSION;
          break;
+#ifdef REDOX
+     }else if (arg == "-i" || arg == "--cein") {
+#else
      }else if (arg == "-i" || arg == "--cpin") {
+#endif
          if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
          marked[i] = true;
          cpin_ = argnext;
+#ifdef REDOX
+     }else if (arg == "-o" || arg == "--calceo-output") {
+#else
      }else if (arg == "-o" || arg == "--calcpka-output") {
+#endif
          if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
          marked[i] = true;
@@ -87,12 +98,21 @@ expert_(false)
          marked[i++] = true;
          marked[i] = true;
          cumout_ = argnext;
+#ifdef REDOX
+     }else if (arg == "--calceo") {
+         marked[i] = true;
+         do_calcpka_ = true;
+     }else if (arg == "--no-calceo") {
+         marked[i] = true;
+         do_calcpka_ = false;
+#else
      }else if (arg == "--calcpka") {
          marked[i] = true;
          do_calcpka_ = true;
      }else if (arg == "--no-calcpka") {
          marked[i] = true;
          do_calcpka_ = false;
+#endif
      }else if (arg == "-r" || arg == "--running-avg") {
          if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
@@ -103,6 +123,13 @@ expert_(false)
          marked[i++] = true;
          marked[i] = true;
          time_step_ = StringToFloat(argnext);
+#ifdef REDOX
+     }else if (arg == "-temp0" || arg == "--temperature") {
+         if (!has_another) {parse_return_ = INSUFARGS; break;}
+         marked[i++] = true;
+         marked[i] = true;
+         temp0_ = StringToFloat(argnext);
+#endif
      }else if (arg == "--chunk") {
          if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
@@ -121,6 +148,19 @@ expert_(false)
          marked[i++] = true;
          marked[i] = true;
          interval_ = StringToInt(argnext);
+#ifdef REDOX
+     }else if (arg == "-p" || arg == "--reduced") {
+         marked[i] = true;
+         protonated_ = true;
+         pKa_ = false;
+     }else if (arg == "-d" || arg == "--oxidized") {
+         marked[i] = true;
+         protonated_ = false;
+         pKa_ = false;
+     }else if (arg == "-a" || arg == "--Eo") {
+         marked[i] = true;
+         pKa_ = true;
+#else
      }else if (arg == "-p" || arg == "--protonated") {
          marked[i] = true;
          protonated_ = true;
@@ -132,6 +172,7 @@ expert_(false)
      }else if (arg == "-a" || arg == "--pKa") {
          marked[i] = true;
          pKa_ = true;
+#endif
      }else if (arg == "--population") {
          if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
@@ -200,17 +241,33 @@ void CLOptions::Help() {
    cout << "                   to compute statistics. [Default behavior]" << endl;
    cout << endl;
    cout << "Input Files and Options:" << endl;
+#ifdef REDOX
+   cout << "    -i FILE, --cein FILE" << endl;
+   cout << "                   Input cein file (from pmemd or sander) with titrating residue" << endl;
+#else
    cout << "    -i FILE, --cpin FILE" << endl;
-   cout << "                   Input cpin file (from sander) with titrating residue" << endl;
+   cout << "                   Input cpin file (from pmemd or sander) with titrating residue" << endl;
+#endif
    cout << "                   information." << endl;
+#ifdef REDOX
+   cout << "    -temp0 FLOAT, --temperature FLOAT" << endl;
+   cout << "                   This is the temperature in Kelvins you used in your simulations." << endl;
+   cout << "                   It will be used to compute Eo using the Nerst equation." << endl;
+   cout << "                   Default is 300.0 K" << endl;
+#endif
    cout << "    -t FLOAT, --time-step FLOAT" << endl;
    cout << "                   This is the time step in ps you used in your simulations." << endl;
    cout << "                   It will be used to print data as a function of time." << endl;
    cout << "                   Default is 2 fs (0.002)" << endl;
    cout << endl;
    cout << "Output Files:" << endl;
+#ifdef REDOX
+   cout << "    -o FILE, --calceo-output FILE" << endl;
+   cout << "                   File to which the standard `calceo'-type statistics" << endl;
+#else
    cout << "    -o FILE, --calcpka-output FILE" << endl;
    cout << "                   File to which the standard `calcpka'-type statistics" << endl;
+#endif
    cout << "                   are written. Default is stdout" << endl;
    cout << "    -R FILE, --running-avg-out FILE" << endl;
    cout << "                   Output file where the running averages of time series" << endl;
@@ -226,7 +283,11 @@ void CLOptions::Help() {
    cout << "                   is printed (see [Output Options] below for details)." << endl;
    cout << "                   Default is [cumulative.dat]" << endl;
    cout << "    --population FILE" << endl;
+#ifdef REDOX
+   cout << "                   Output file where reduction state populations are" << endl;
+#else
    cout << "                   Output file where protonation state populations are" << endl;
+#endif
    cout << "                   printed for every state of every residue." << endl;
    cout << "    --conditional-output FILE" << endl;
    cout << "                   Output file with requested conditional probabilities." << endl;
@@ -240,30 +301,54 @@ void CLOptions::Help() {
    cout << endl;
    cout << "    -v INT, --verbose INT" << endl;
    cout << "                   Controls how much information is printed to the" << endl;
+#ifdef REDOX
+   cout << "                   calceo-style output file. Options are:" << endl;
+   cout << "                      (0) Just print fraction reduced. [Default]" << endl;
+   cout << "                      (1) Print everything calceo prints." << endl;
+#else
    cout << "                   calcpka-style output file. Options are:" << endl;
    cout << "                      (0) Just print fraction protonated. [Default]" << endl;
    cout << "                      (1) Print everything calcpka prints." << endl;
+#endif
    cout << "    -n INT, --interval INT" << endl;
    cout << "                   An interval between which to print out time series data" << endl;
    cout << "                   like `chunks', `cumulative' data, and running averages." << endl;
    cout << "                   It is also used as the 'window' of the conditional" << endl;
    cout << "                   probability time series (--chunk-conditional)." << endl;
    cout << "                   Default [1000]" << endl;
+#ifdef REDOX
+   cout << "    -p, --reduced" << endl;
+   cout << "                   Print out reduction fraction instead of oxidation" << endl;
+   cout << "                   fraction in time series data (Default behavior)." << endl;
+   cout << "    -d, --oxidized" << endl;
+   cout << "                   Print out oxidation fraction instead of reduction" << endl;
+   cout << "                   fraction in time series data." << endl;
+   cout << "    -a, --Eo       Print predicted Eos (via Nernst equation) in place" << endl;
+   cout << "                   of fraction reduced or oxidized. NOT default behavior." << endl;
+#else
    cout << "    -p, --protonated" << endl;
    cout << "                   Print out protonation fraction instead of deprotonation" << endl;
    cout << "                   fraction in time series data (Default behavior)." << endl;
    cout << "    -d, --deprotonated" << endl;
    cout << "                   Print out deprotonation fraction instead of protonation" << endl;
    cout << "                   fraction in time series data." << endl;
-   cout << "    -a, --pKa      Print predicted pKas (via Henderson-Hasselbalch) in place" << endl;
+   cout << "    -a, --pKa      Print predicted pKas (via Henderson-Hasselbalch equation) in place" << endl;
    cout << "                   of fraction (de)protonated. NOT default behavior." << endl;
+#endif
    cout << endl;
    cout << "Analysis Options:" << endl;
    cout << "  These options control which analyses are done. By default, only" << endl;
+#ifdef REDOX
+   cout << "  the original, calceo-style analysis is done." << endl;
+   cout << endl;
+   cout << "    --calceo       Triggers the calceo-style output [On by default]" << endl;
+   cout << "    --no-calceo    Turns off the calceo-style output" << endl;
+#else
    cout << "  the original, calcpka-style analysis is done." << endl;
    cout << endl;
    cout << "    --calcpka      Triggers the calcpka-style output [On by default]" << endl;
    cout << "    --no-calcpka   Turns off the calcpka-style output" << endl;
+#endif
    cout << "    -r WINDOW, --running-avg WINDOW" << endl;
    cout << "                   Defines a window size for a moving, running average" << endl;
    cout << "                   time series. <WINDOW> is the number of MD steps (NOT" << endl;
@@ -276,7 +361,11 @@ void CLOptions::Help() {
    cout << "                   for options) over the course of the trajectory." << endl;
    cout << "    --fix-remd PREFIX" << endl;
    cout << "                   This option will trigger " << prog_ << " to reassemble the " << endl;
+#ifdef REDOX
+   cout << "                   titration data into Redox potential specific ensembles. This" << endl;
+#else
    cout << "                   titration data into pH-specific ensembles. This" << endl;
+#endif
    cout << "                   is an exclusive mode of the program---no other" << endl;
    cout << "                   analyses will be done." << endl;
    cout << "    -c CONDITIONAL, --conditional CONDITIONAL" << endl;
@@ -284,6 +373,16 @@ void CLOptions::Help() {
    cout << "                   string of the format:" << endl;
    cout << "                         <resid>:<state>,<resid>:<state>,..." << endl;
    cout << "                     or" << endl;
+#ifdef REDOX
+   cout << "                         <resid>:REDU,<resid>:OXID,..." << endl;
+   cout << "                     or" << endl;
+   cout << "                         <resid>:<state1>;<state2>,<resid>:REDU,..." << endl;
+   cout << "                   Where <resid> is the residue number in the prmtop (NOT the" << endl;
+   cout << "                   cein) and <state> is either the state number or p (reduced)" << endl;
+   cout << "                   or d (oxidized), case-insensitive" << endl;
+   cout << endl;
+   cout << "This program analyzes constant Redox potential output files (ceout) from Amber." << endl;
+#else
    cout << "                         <resid>:PROT,<resid>:DEPROT,..." << endl;
    cout << "                     or" << endl;
    cout << "                         <resid>:<state1>;<state2>,<resid>:PROT,..." << endl;
@@ -292,6 +391,7 @@ void CLOptions::Help() {
    cout << "                   or (d)eprotonated, case-insensitive" << endl;
    cout << endl;
    cout << "This program analyzes constant pH output files (cpout) from Amber." << endl;
+#endif
    cout << "These output files can be compressed using gzip compression. The" << endl;
    cout << "compression will be detected automatically by the file name extension." << endl;
    cout << "You must have the gzip headers for this functionality to work." << endl;
@@ -300,12 +400,21 @@ void CLOptions::Help() {
 }
 
 void CLOptions::Usage() {
+#ifdef REDOX
+   cout << "Usage: " << prog_ << " [-O] [-V] [-h] [-i <cein>] [-t] [-o FILE] [-temp0 FLOAT] [-R FILE -r INT]" << endl;
+   cout << "             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]" << endl;
+   cout << "             [-v INT] [-n INT] [-p|-d] [--calceo|--no-calceo] [--fix-remd]" << endl;
+   cout << "             [--population FILE] [-c CONDITION -c CONDITION -c ...]" << endl;
+   cout << "             [--conditional-output FILE] [--chunk-conditional FILE]" << endl;
+   cout << "             ceout1 [ceout2 [ceout3 ...] ]" << endl;
+#else
    cout << "Usage: " << prog_ << " [-O] [-V] [-h] [-i <cpin>] [-t] [-o FILE] [-R FILE -r INT]" << endl;
    cout << "             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]" << endl;
    cout << "             [-v INT] [-n INT] [-p|-d] [--calcpka|--no-calcpka] [--fix-remd]" << endl;
    cout << "             [--population FILE] [-c CONDITION -c CONDITION -c ...]" << endl;
    cout << "             [--conditional-output FILE] [--chunk-conditional FILE]" << endl;
    cout << "             cpout1 [cpout2 [cpout3 ...] ]" << endl;
+#endif
 
    return;
 }
@@ -345,6 +454,13 @@ int CLOptions::CheckInput() {
       cerr << "Error: --time-step must be a positive number!" << endl;
       inerr = 1;
    }
+
+#ifdef REDOX
+   if (temp0_ <= 0) {
+      cerr << "Error: --temperature must be a positive number!" << endl;
+      inerr = 1;
+   }
+#endif
 
    if (interval_ <= 0) {
       cerr << "Error: -n/--interval must be a positive integer!" << endl;

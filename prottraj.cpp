@@ -1,6 +1,10 @@
 // prottraj.cpp: Set up vectors of all of the protonation states for each snapshot
 
+#ifdef REDOX
+#include <cmath>   // log
+#else
 #include <cmath>   // log10
+#endif
 #include <iomanip> // setw
 #include <sstream> // istringstream
 #include <fstream> // ofstream
@@ -16,7 +20,14 @@
 
 using namespace std;
 
+#ifdef REDOX
+ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin, const float temp0) :
+temp0_(temp0),
+KB_(0.001987204118),
+FARADAY_(23.06054801),
+#else
 ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin) :
+#endif
 cpin_(NULL),
 nres_(0),
 pH_(0.0f),
@@ -88,11 +99,29 @@ void ProtTraj::PrintCalcpka(ostream& fd, const int start) {
    }
 
    // Now do the printing
+#ifdef REDOX
+   fd.precision(5);
+   fd << fixed;
+   fd << "Redox potential is " << setw(9) << pH_ << " V, temperature is " << setprecision(2) << setw(9) << temp0_ << " K" << endl;
+   fd.precision(5);
+#else
    fd.precision(3);
    fd << fixed;
    fd << "Solvent pH is " << setw(8) << pH_ << endl;
+#endif
    int i = 0;
    for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
+#ifdef REDOX
+      double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (double) (nframes_-nprot[i]) / (double) nprot[i] );
+      float offset = (float) pKa - pH_;
+      fd << setw(3) << rit->getResname() << " " << setw(4) << left << rit->getResnum()
+         << ": Offset " << right << setw(7) << offset << " V  Pred Eo " << setw(7) << pKa
+         << " V  Frac Redu " << setw(4) << (double) nprot[i] / (double) nframes_
+         << "  Transitions " << setw(9) << transitions[i] << endl;
+      i++;
+   }
+   fd << endl << "Average total molecular reduction: " << setw(7)
+#else
       double pKa = pH_ - log10( (double) (nframes_-nprot[i]) / (double) nprot[i] );
       float offset = (float) pKa - pH_;
       fd << setw(3) << rit->getResname() << " " << setw(4) << left << rit->getResnum()
@@ -102,6 +131,7 @@ void ProtTraj::PrintCalcpka(ostream& fd, const int start) {
       i++;
    }
    fd << endl << "Average total molecular protonation: " << setw(7)
+#endif
       << (double)totprot / (double)nframes_ << endl;
 
    return;
@@ -126,7 +156,11 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
       iss << rit->getResname() << " " << rit->getResnum();
       fp << setw(8) << iss.str() << " ";
    }
+#ifdef REDOX
+   fp << " Total Avg. Redu." << endl;
+#else
    fp << " Total Avg. Prot." << endl;
+#endif
 
    int interval = window / time_step_;
    int first = 0;
@@ -153,8 +187,13 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
             fp << setprecision(5) << setw(8) << fracprot << " ";
         }else if (print_pka) {
             // We want the pKa
+#ifdef REDOX
+            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (1.0 - fracprot) / fracprot );
+            fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
+#else
             double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
             fp << setprecision(4) << setw(8) << pKa << " ";
+#endif
         }else {
             // We want the fraction deprotonated
             fp << setprecision(5) << setw(8) << 1.0-fracprot << " ";
@@ -185,7 +224,11 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
       iss << rit->getResname() << " " << rit->getResnum();
       fp << setw(8) << iss.str() << " ";
    }
+#ifdef REDOX
+   fp << " Total Avg. Redu." << endl;
+#else
    fp << " Total Avg. Prot." << endl;
+#endif
 
    // Now go through the trajectory
    vector<long long int> nprot(nres_, 0ll);
@@ -215,8 +258,13 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
                fp << setprecision(5) << setw(8) << fracprot << " ";
            }else if (print_pka) {
                // We want the pKa
+#ifdef REDOX
+               double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (1.0 - fracprot) / fracprot );
+               fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
+#else
                double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
                fp << setprecision(4) << setw(8) << pKa << " ";
+#endif
            }else {
                // We want the fraction deprotonated
                fp << setprecision(5) << setw(8) << 1.0-fracprot << " ";
@@ -249,7 +297,11 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
       iss << rit->getResname() << " " << rit->getResnum();
       fp << setw(8) << iss.str() << " ";
    }
+#ifdef REDOX
+   fp << " Total Avg. Redu." << endl;
+#else
    fp << " Total Avg. Prot." << endl;
+#endif
 
    for (int i = 1; i < nframes_ + 1; i+= interval/time_step_) {
       vector<long long int> nprot(nres_, 0ll);
@@ -276,8 +328,13 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
             fp << setprecision(5) << setw(8) << fracprot << " ";
         }else if (print_pka) {
             // We want the pKa
+#ifdef REDOX
+            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (1.0 - fracprot) / fracprot );
+            fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
+#else
             double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
             fp << setprecision(4) << setw(8) << pKa << " ";
+#endif
         }else {
             // We want the fraction deprotonated
             fp << setprecision(5) << setw(8) << 1.0-fracprot << " ";

@@ -24,7 +24,11 @@ int Cpin::Parse(const char* cpinname) {
    char *my_fname = (char*) filename_.c_str();
    char resname[TITR_RES_C+1][40];
    int ierr;
+#ifdef REDOX
+   parse_cein_(&trescnt_, protcnt_, stateinf_, resname, my_fname, &ierr);
+#else
    parse_cpin_(&trescnt_, protcnt_, stateinf_, resname, my_fname, &ierr);
+#endif
 
    // Error catch
    if (ierr != 0) {

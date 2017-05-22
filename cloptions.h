@@ -50,6 +50,9 @@ class CLOptions {
       bool PrintDeprotonated() const           { return !protonated_;    }
       std::string REMDPrefix() const           { return reorder_prefix_; }
       float TimeStep() const                   { return time_step_;      }
+#ifdef REDOX
+      float Temperature() const                { return temp0_;          }
+#endif
       bool pKa() const                         { return pKa_;            }
       std::string Population() const           { return population_;     }
       std::vector<ConditionalProb> CondProbs() { return condprobs_;      }
@@ -104,6 +107,10 @@ class CLOptions {
       bool protonated_;
       /// Time step used in the simulation
       float time_step_;
+#ifdef REDOX
+      /// Temperature used in the simulation
+      float temp0_;
+#endif
       /// Do we put predicted pKas for time series?
       bool pKa_;
       /// Protonated fraction output file
