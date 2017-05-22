@@ -12,7 +12,7 @@ using namespace std;
 /// Test if a file exists
 bool fexists(string const& fname) {
    ifstream f(fname.c_str());
-   return f;
+   return f.is_open();
 }
 
 int sort_remd_files(CpoutList cpouts, string const& prefix, 
