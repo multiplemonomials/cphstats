@@ -252,7 +252,7 @@ void CLOptions::Help() {
 #ifdef REDOX
    cout << "    -temp0 FLOAT, --temperature FLOAT" << endl;
    cout << "                   This is the temperature in Kelvins you used in your simulations." << endl;
-   cout << "                   It will be used to compute Eo using the Nerst equation." << endl;
+   cout << "                   It will be used to compute Eo using the Nernst equation." << endl;
    cout << "                   Default is 300.0 K" << endl;
 #endif
    cout << "    -t FLOAT, --time-step FLOAT" << endl;

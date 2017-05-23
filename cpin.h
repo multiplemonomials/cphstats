@@ -51,8 +51,8 @@ class TitratableResidue {
       // Determine how many protons are in a specific state
       int numProtons(int state) const { return protcnts_[state]; }
 #ifdef REDOX
-      // Computing the maximum and the minimum number of electrons at ELECCNT on cein, in order to get the value of v of the Nerst equation
-      int getvNerst() const {
+      // Computing the maximum and the minimum number of electrons at ELECCNT on cein, in order to get the value of v of the Nernst equation
+      int getvNernst() const {
        int nelecmin = numProtons(0);
        int nelecmax = numProtons(0);
          for (int j = 1; j < numStates(); j++) {

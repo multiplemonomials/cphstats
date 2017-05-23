@@ -112,7 +112,7 @@ void ProtTraj::PrintCalcpka(ostream& fd, const int start) {
    int i = 0;
    for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
 #ifdef REDOX
-      double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (double) (nframes_-nprot[i]) / (double) nprot[i] );
+      double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (double) (nframes_-nprot[i]) / (double) nprot[i] );
       float offset = (float) pKa - pH_;
       fd << setw(3) << rit->getResname() << " " << setw(4) << left << rit->getResnum()
          << ": Offset " << right << setw(7) << offset << " V  Pred Eo " << setw(7) << pKa
@@ -188,7 +188,7 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
         }else if (print_pka) {
             // We want the pKa
 #ifdef REDOX
-            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (1.0 - fracprot) / fracprot );
+            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
             fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
 #else
             double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
@@ -259,7 +259,7 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
            }else if (print_pka) {
                // We want the pKa
 #ifdef REDOX
-               double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (1.0 - fracprot) / fracprot );
+               double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
                fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
 #else
                double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
@@ -329,7 +329,7 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
         }else if (print_pka) {
             // We want the pKa
 #ifdef REDOX
-            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNerst()))*log( (1.0 - fracprot) / fracprot );
+            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
             fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
 #else
             double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
