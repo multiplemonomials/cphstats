@@ -34,8 +34,13 @@ ConditionalProb::RetType ConditionalProb::Set(Cpin const& cpin) {
       active_states_.push_back( ActiveState(rit->numStates(), false) );
 
    // For comparisons
+#ifdef REDOX
+   string DEPROT = string("OXIDIZED");
+   string PROT = string("REDUCED");
+#else
    string DEPROT = string("DEPROTONATED");
    string PROT = string("PROTONATED");
+#endif
 
    // We have to parse something like; <number>:<state>,<number>:<state>,...
    vector<string> criteria = split(instring_.c_str(), ",");

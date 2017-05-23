@@ -23,12 +23,20 @@ int sort_remd_files(CpoutList cpouts, string const& prefix,
    vector<string> suffixes;
    for (cpout_iterator it = cpouts.begin(); it != cpouts.end(); it++) {
       char buf[128];
+#ifdef REDOX
+      sprintf(buf, ".E_%.5f", it->pH());
+#else
       sprintf(buf, ".pH_%.2f", it->pH());
+#endif
       string sfx = string(buf);
       for (vector<string>::const_iterator itt = suffixes.begin();
                itt != suffixes.end(); itt++) {
          if (*itt == sfx) {
+#ifdef REDOX
+            cerr << "Error: Same Redox potential (" << setprecision(5) << it->pH()
+#else
             cerr << "Error: Same pH (" << setprecision(2) << it->pH()
+#endif
                       << ") found twice!" << endl;
             return 1;
          }
@@ -45,7 +53,11 @@ int sort_remd_files(CpoutList cpouts, string const& prefix,
    // Now go through and open every file
    for (RemdMap::iterator it = filemap.begin(); it != filemap.end(); it++) {
       char buf[128];
+#ifdef REDOX
+      sprintf(buf, ".E_%.5f", it->first);
+#else
       sprintf(buf, ".pH_%.2f", it->first);
+#endif
       string fname = prefix + string(buf);
       it->second = fopen(fname.c_str(), "w");
    }
@@ -77,7 +89,11 @@ int sort_remd_files(CpoutList cpouts, string const& prefix,
             continue;
          }
          if (rec.full) {
+#ifdef REDOX
+            fprintf(filemap[rec.pH], "Redox potential: %8.5f\n", rec.pH);
+#else
             fprintf(filemap[rec.pH], "Solvent pH: %8.5f\n", rec.pH);
+#endif
             fprintf(filemap[rec.pH], "Monte Carlo step size: %8d\n", it->StepSize());
             fprintf(filemap[rec.pH], "Time step: %8d\n", rec.time_step);
             fprintf(filemap[rec.pH], "Time: %10.3f\n", rec.time);
@@ -100,10 +116,17 @@ int sort_remd_files(CpoutList cpouts, string const& prefix,
       fclose(it->second);
 
    if (!all_assigned) {
+#ifdef REDOX
+      cerr << "WARNING: not all data records were assigned to a specific ceout file" << endl
+           << "         this can happen, for instance, if you did *not* provide all" << endl
+           << "         of the replica ceout files to cestats to process. Check" << endl
+           << "         your results carefully!" << endl;
+#else
       cerr << "WARNING: not all data records were assigned to a specific cpout file" << endl
            << "         this can happen, for instance, if you did *not* provide all" << endl
            << "         of the replica cpout files to cphstats to process. Check" << endl
            << "         your results carefully!" << endl;
+#endif
    }
    return 0;
 }
