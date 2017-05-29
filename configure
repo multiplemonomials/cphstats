@@ -134,11 +134,11 @@ f.write("""# configured with [[ %(confline)s ]]
 
 # Compilers
 CXX = %(cpp)s
-F90 = %(f90)s
+FC = %(f90)s
 LD = %(ld)s
 
 # Flags
-F90FLAGS = %(f90flags)s
+FCFLAGS = %(f90flags)s
 CXXFLAGS = %(cppflags)s
 LDFLAGS = %(ldflags)s
 
