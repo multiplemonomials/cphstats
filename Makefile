@@ -16,10 +16,10 @@ PROGNAME2 = cestats
 all: $(PROGNAME) $(PROGNAME2)
 
 $(PROGNAME): $(OBJS)
-	$(LD) -o $(PROGNAME) $(OBJS) $(LDFLAGS)
+	$(CXX) -o $(PROGNAME) $(OBJS) $(LDFLAGS) $(NOFORTRANMAIN)
 
 $(PROGNAME2): $(OBJS2)
-	$(LD) -o $(PROGNAME2) $(OBJS2) $(LDFLAGS2)
+	$(CXX) -o $(PROGNAME2) $(OBJS2) $(LDFLAGS) $(NOFORTRANMAIN)
 
 install: $(PROGNAME) $(PROGNAME2)
 	/bin/mv $(PROGNAME) $(BASEDIR)/bin
@@ -35,16 +35,16 @@ depends::
 	./makedepends
 
 .F90.ph.o:
-	$(F90) $(F90FLAGS) -c $*.F90 -o $*.ph.o
+	$(FC) $(FCFLAGS) -c -DPH $*.F90 -o $*.ph.o
 
 .cpp.ph.o:
-	$(CXX) $(CXXFLAGS) -c $*.cpp -o $*.ph.o
+	$(CXX) $(CXXFLAGS) -c -DPH $*.cpp -o $*.ph.o
 
 .F90.redox.o:
-	$(F90) $(F90FLAGS2) -c $*.F90 -o $*.redox.o
+	$(FC) $(FCFLAGS) -c -DREDOX $*.F90 -o $*.redox.o
 
 .cpp.redox.o:
-	$(CXX) $(CXXFLAGS2) -c $*.cpp -o $*.redox.o
+	$(CXX) $(CXXFLAGS) -c -DREDOX $*.cpp -o $*.redox.o
 
 clean:
 	/bin/rm -f $(OBJS) $(OBJS2)

@@ -138,12 +138,9 @@ F90 = %(f90)s
 LD = %(ld)s
 
 # Flags
-F90FLAGS = -DPH %(f90flags)s
-CXXFLAGS = -DPH %(cppflags)s
-LDFLAGS = -DPH %(ldflags)s
-F90FLAGS2 = -DREDOX %(f90flags)s
-CXXFLAGS2 = -DREDOX %(cppflags)s
-LDFLAGS2 = -DREDOX %(ldflags)s
+F90FLAGS = %(f90flags)s
+CXXFLAGS = %(cppflags)s
+LDFLAGS = %(ldflags)s
 
 # Where program gets installed
 BASEDIR = %(prefix)s
