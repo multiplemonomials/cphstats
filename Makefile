@@ -38,13 +38,13 @@ depends::
 	$(FC) $(FCFLAGS) -c -DPH $*.F90 -o $*.ph.o
 
 .cpp.ph.o:
-	$(CXX) $(CXXFLAGS) -c -DPH $*.cpp -o $*.ph.o
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -DPH $*.cpp -o $*.ph.o
 
 .F90.redox.o:
 	$(FC) $(FCFLAGS) -c -DREDOX $*.F90 -o $*.redox.o
 
 .cpp.redox.o:
-	$(CXX) $(CXXFLAGS) -c -DREDOX $*.cpp -o $*.redox.o
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -DREDOX $*.cpp -o $*.redox.o
 
 clean:
 	/bin/rm -f $(OBJS) $(OBJS2)
