@@ -28,6 +28,7 @@ install: $(PROGNAME) $(PROGNAME2)
 uninstall:
 	/bin/rm -f $(BASEDIR)/bin/$(PROGNAME)
 	/bin/rm -f $(BASEDIR)/bin/$(PROGNAME2)
+	/bin/rm -f config.h
 
 .SUFFIXES: .F90 .cpp .ph.o .redox.o
 
