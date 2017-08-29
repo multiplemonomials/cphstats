@@ -22,9 +22,6 @@ using namespace std;
 
 #ifdef REDOX
 ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin, const float temp0) :
-temp0_(temp0),
-KB_(0.001987204118),
-FARADAY_(23.06054801),
 #else
 ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin) :
 #endif
@@ -32,6 +29,9 @@ cpin_(NULL),
 nres_(0),
 pH_(0.0f),
 nframes_(0),
+#ifdef REDOX
+temp0_(temp0),
+#endif
 time_step_(0)
 {
    cpin_ = cpin;
@@ -112,7 +112,7 @@ void ProtTraj::PrintCalcpka(ostream& fd, const int start) {
    int i = 0;
    for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
 #ifdef REDOX
-      double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (double) (nframes_-nprot[i]) / (double) nprot[i] );
+      double pKa = pH_ - (KB*temp0_/(FARADAY*rit->getvNernst()))*log( (double) (nframes_-nprot[i]) / (double) nprot[i] );
       float offset = (float) pKa - pH_;
       fd << setw(3) << rit->getResname() << " " << setw(4) << left << rit->getResnum()
          << ": Offset " << right << setw(7) << offset << " V  Pred Eo " << setw(7) << pKa
@@ -188,7 +188,7 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
         }else if (print_pka) {
             // We want the pKa
 #ifdef REDOX
-            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
+            double pKa = pH_ - (KB*temp0_/(FARADAY*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
             fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
 #else
             double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
@@ -213,7 +213,7 @@ void ProtTraj::PrintChunks(const int window, string const& fname,
 /// Prints a cumulative running average time series of the desired property
 void ProtTraj::PrintCumulative(string const& fname, const int interval,
                                const bool print_prot, const bool print_pka) {
-   
+
    // Open up the file and write a header
    ofstream fp(fname.c_str());
    if (!fp.is_open())
@@ -235,7 +235,7 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
    long long int totprot = 0ll;
    int c = 0; // simple counter
    for (int i = 1; i < nframes_ + 1; i++) {
-      
+
       { // scope this
       int j = 0;
       for (Cpin::ResIterator rit = cpin_->begin(); rit != cpin_->end(); rit++) {
@@ -259,7 +259,7 @@ void ProtTraj::PrintCumulative(string const& fname, const int interval,
            }else if (print_pka) {
                // We want the pKa
 #ifdef REDOX
-               double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
+               double pKa = pH_ - (KB*temp0_/(FARADAY*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
                fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
 #else
                double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );
@@ -329,7 +329,7 @@ void ProtTraj::PrintRunningAvg(const int window, const int interval,
         }else if (print_pka) {
             // We want the pKa
 #ifdef REDOX
-            double pKa = pH_ - (KB_*temp0_/(FARADAY_*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
+            double pKa = pH_ - (KB*temp0_/(FARADAY*rit->getvNernst()))*log( (1.0 - fracprot) / fracprot );
             fp << setprecision(5) << setw(8) << pKa << setprecision(4) << " ";
 #else
             double pKa = pH_ - log10( (1.0 - fracprot) / fracprot );

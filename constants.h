@@ -1,7 +1,6 @@
 #ifndef CONSTANTS_H
-#define CONSTANTS_H
+#define CONSTANTS_H /* These match the constants from sander.h */
 
-// These match the same from sander
 #define STATEINF_FLD_C 5
 #define TITR_RES_C 50
 #define TITR_STATES_C 200
@@ -10,5 +9,8 @@
 
 #define FN_LEN 256
 #define LINEBUF 512
+
+#define KB 0.001987204118
+#define FARADAY 23.06054801
 
 #endif /* CONSTANTS_H */

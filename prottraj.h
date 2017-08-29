@@ -75,19 +75,13 @@ class ProtTraj {
       // Number of frames
       long long int nframes_;
 
-      // Monte carlo time step
-      int time_step_;
-
 #ifdef REDOX
       // Temperature
       float temp0_;
-
-      // Boltzmann constant in kcal/(mol.K)
-      const double KB_;
-
-      // Faraday constant in kcal/(mol.V)
-      const double FARADAY_;
 #endif
+
+      // Monte carlo time step
+      int time_step_;
 
       typedef struct {
          std::vector<long long int> state_cnt;
