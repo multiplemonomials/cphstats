@@ -1,5 +1,5 @@
 #ifndef CONSTANTS_H
-#define CONSTANTS_H /* These match the constants from sander.h */
+#define CONSTANTS_H /* These match the constants from sander */
 
 #define STATEINF_FLD_C 5
 #define TITR_RES_C 50
