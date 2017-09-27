@@ -40,7 +40,6 @@ set(CPHSTATS_FORTRAN_SOURCES parse_cpin.F90)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #cphstats uses optimization
-message("OPT_CXXFLAGS_SPC: ${OPT_CXXFLAGS_SPC}")
 set_property(SOURCE ${CPHSTATS_CXX_SOURCES} PROPERTY COMPILE_FLAGS ${OPT_CXXFLAGS_SPC})
 set_property(SOURCE ${CPHSTATS_FORTRAN_SOURCES} PROPERTY COMPILE_FLAGS ${OPT_FFLAGS_SPC})
 
