@@ -24,6 +24,9 @@ typedef struct {
    int time_step;
    float time;
    float pH;
+#ifdef REDOX
+   float Temperature;
+#endif
    bool full;
 } Record;
 
@@ -41,6 +44,9 @@ class CpoutFile {
       int Nres() const       { return nres_;            }
       int StepSize() const   { return step_size_;       }
       float pH() const       { return orig_ph_;         }
+#ifdef REDOX
+      float Temperature() const { return orig_temp0_;      }
+#endif
       float startTime() const{ return start_time_;      }
       void WarnRemd() const {
             if (remd_file_)
@@ -98,6 +104,9 @@ class CpoutFile {
       bool valid_;       // Is this a valid file?
       bool done_;        // Is this file done reading?
       float orig_ph_;    // pH on the opening full record
+#ifdef REDOX
+      float orig_temp0_;    // Temperature on the opening full record
+#endif
       int step_size_;    // Monte carlo step size
       int nres_;         // Number of residues defined in this cpout
       float start_time_; // The time in the first full record

@@ -21,7 +21,7 @@
 using namespace std;
 
 #ifdef REDOX
-ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin, const float temp0) :
+ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin, float temp0) :
 #else
 ProtTraj::ProtTraj(Cpin* cpin, float pH, Record const& recin) :
 #endif
@@ -30,14 +30,17 @@ nres_(0),
 pH_(0.0f),
 nframes_(0),
 #ifdef REDOX
-temp0_(temp0),
+temp0_(0.0f),
 #endif
 time_step_(0)
 {
    cpin_ = cpin;
    nres_ = cpin->getTrescnt();
    pH_ = pH;
-
+#ifdef REDOX
+   temp0_ = temp0;
+#endif
+   
    // Set the first point
    for (int i = 0; i < nres_; i++)
       last_point_.push_back(0);

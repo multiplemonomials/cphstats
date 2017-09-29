@@ -16,6 +16,9 @@ type_(ASCII),
 valid_(true),
 done_(false),
 orig_ph_(0.0f),
+#ifdef REDOX
+orig_temp0_(0.0f),
+#endif
 step_size_(0),
 nres_(0),
 remd_file_(false)
@@ -61,7 +64,7 @@ remd_file_(false)
       valid_ = false;
   }else if (valid_) {
 #ifdef REDOX
-      if (sscanf(buf, "Redox potential: %f V\n", &orig_ph_) == 1) {
+      if (sscanf(buf, "Redox potential: %f V Temperature: %f K\n", &orig_ph_, &orig_temp0_) == 2) {
 #else
       if (sscanf(buf, "Solvent pH: %f\n", &orig_ph_) == 1) {
 #endif
@@ -150,17 +153,23 @@ Record CpoutFile::GetRecord() {
    }
    Record result;
    float pH;
+#ifdef REDOX
+   float temp0;
+#endif
    int res;
    int state;
    result.pH = 0.0f;
    result.full = false;
 #ifdef REDOX
-   if (sscanf(buf, "Redox potential: %f V\n", &pH) == 1) {
+   if (sscanf(buf, "Redox potential: %f V Temperature: %f K\n", &pH, &temp0) == 2) {
 #else
    if (sscanf(buf, "Solvent pH: %f\n", &pH) == 1) {
 #endif
       result.full = true;
       result.pH = pH;
+#ifdef REDOX
+      result.Temperature = temp0;
+#endif
       Gets(buf, LINEBUF); // Monte Carlo step size
       Gets(buf, LINEBUF); // Time step:
       sscanf(buf, "Time step: %d\n", &result.time_step);

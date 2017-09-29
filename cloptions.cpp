@@ -21,9 +21,6 @@ overwrite_(false),
 interval_(1000),
 protonated_(true),
 time_step_(0.002f),
-#ifdef REDOX
-temp0_(300.0f),
-#endif
 pKa_(false),
 debug_(false),
 expert_(false)
@@ -123,13 +120,6 @@ expert_(false)
          marked[i++] = true;
          marked[i] = true;
          time_step_ = StringToFloat(argnext);
-#ifdef REDOX
-     }else if (arg == "-temp0" || arg == "--temperature") {
-         if (!has_another) {parse_return_ = INSUFARGS; break;}
-         marked[i++] = true;
-         marked[i] = true;
-         temp0_ = StringToFloat(argnext);
-#endif
      }else if (arg == "--chunk") {
          if (!has_another) {parse_return_ = INSUFARGS; break;}
          marked[i++] = true;
@@ -249,12 +239,6 @@ void CLOptions::Help() {
    cout << "                   Input cpin file (from pmemd or sander) with titrating residue" << endl;
 #endif
    cout << "                   information." << endl;
-#ifdef REDOX
-   cout << "    -temp0 FLOAT, --temperature FLOAT" << endl;
-   cout << "                   This is the temperature in Kelvins you used in your simulations." << endl;
-   cout << "                   It will be used to compute Eo using the Nernst equation." << endl;
-   cout << "                   Default is 300.0 K" << endl;
-#endif
    cout << "    -t FLOAT, --time-step FLOAT" << endl;
    cout << "                   This is the time step in ps you used in your simulations." << endl;
    cout << "                   It will be used to print data as a function of time." << endl;
@@ -401,7 +385,7 @@ void CLOptions::Help() {
 
 void CLOptions::Usage() {
 #ifdef REDOX
-   cout << "Usage: " << prog_ << " [-O] [-V] [-h] [-i <cein>] [-t] [-o FILE] [-temp0 FLOAT] [-R FILE -r INT]" << endl;
+   cout << "Usage: " << prog_ << " [-O] [-V] [-h] [-i <cein>] [-t] [-o FILE] [-R FILE -r INT]" << endl;
    cout << "             [--chunk INT --chunk-out FILE] [--cumulative --cumulative-out FILE]" << endl;
    cout << "             [-v INT] [-n INT] [-p|-d] [--calceo|--no-calceo] [--fix-remd]" << endl;
    cout << "             [--population FILE] [-c CONDITION -c CONDITION -c ...]" << endl;
@@ -454,13 +438,6 @@ int CLOptions::CheckInput() {
       cerr << "Error: --time-step must be a positive number!" << endl;
       inerr = 1;
    }
-
-#ifdef REDOX
-   if (temp0_ <= 0) {
-      cerr << "Error: --temperature must be a positive number!" << endl;
-      inerr = 1;
-   }
-#endif
 
    if (interval_ <= 0) {
       cerr << "Error: -n/--interval must be a positive integer!" << endl;
