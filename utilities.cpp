@@ -90,7 +90,7 @@ int sort_remd_files(CpoutList cpouts, string const& prefix,
          }
          if (rec.full) {
 #ifdef REDOX
-            fprintf(filemap[rec.pH], "Redox potential: %8.5f\n", rec.pH);
+            fprintf(filemap[rec.pH], "Redox potential: %12.7f V Temperature: %7.2f K\n", rec.pH, rec.Temperature);
 #else
             fprintf(filemap[rec.pH], "Solvent pH: %8.5f\n", rec.pH);
 #endif

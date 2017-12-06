@@ -130,7 +130,7 @@ int main(int argc, char**argv) {
       return sort_remd_files(cpouts, clopt.REMDPrefix(), clopt.Overwrite());
 
 #ifdef REDOX
-   ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord(), clopt.Temperature());
+   ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord(), cpouts[0].Temperature());
 #else
    ProtTraj stats = ProtTraj(&my_cpin, cpouts[0].pH(), cpouts[0].GetRecord());
 #endif
