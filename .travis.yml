@@ -18,9 +18,8 @@ compiler:
   - clang
 
 install:
-  - travis_build.sh
+  - ./travis_build.sh
 
-  
 script:
   - cd test_ph && ./testall.sh
   - cd ..
