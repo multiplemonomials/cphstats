@@ -20,6 +20,8 @@ compiler:
 install:
   - travis_build.sh
 
+  
 script:
   - cd test_ph && ./testall.sh
+  - cd ..
   - cd test_redox && ./testall.sh
